@@ -15,7 +15,7 @@ class TestPreprocessorFuncs(unittest.TestCase):
                     'train/pneumonia/person993_bacteria_2000921.jpeg'
                 )
             )
-        except ExceptionType:
+        except Exception:
             self.fail("The given image path does not exist!")
 
 
