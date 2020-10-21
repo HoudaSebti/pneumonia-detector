@@ -46,7 +46,7 @@ setup(
     author='Houda Sebti [Leakmited]',
     author_email='houda.sebti@leakmited.com',
     license='License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
-    packages=find_packages(exclude=[]),
+    packages=find_packages(exclude=['tests']),
     install_requires=requirements(),
     include_package_data=True,
     zip_safe=False
