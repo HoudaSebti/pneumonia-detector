@@ -1,2 +1,2 @@
 # pneumonia-detector
-A deep learning pneumonia detector
+A deep learning based pneumonia detector
