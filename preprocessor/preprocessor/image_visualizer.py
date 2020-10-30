@@ -13,8 +13,8 @@ def path_sanity_check(image_path):
 
 def visualize_image(image_path):
     path_sanity_check(image_path)
-    plt.imshow(image_path)
-    plt.show()
+    image = Image.open(image_path)
+    image.show(image_path)
 
 def get_image_shape(image_path):
     image = Image.open(image_path)
