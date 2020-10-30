@@ -17,7 +17,7 @@ def visualize_image(image_path):
     plt.show()
 
 def get_image_shape(image_path):
-    image = Image.Open(image_path)
+    image = Image.open(image_path)
     return image.size
 
 if __name__ == '__main__':
