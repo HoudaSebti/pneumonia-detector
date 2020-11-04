@@ -19,9 +19,12 @@ def get_image_shape(image_path):
 
 if __name__ == '__main__':
     args = argument_parser.parse_args()
-    print(
-        get_image_shape(
-            args.data_path
-        )
+    image_path = os.path.join(
+        args.data_path,
+        'train/normal/NORMAL2-IM-0856-0001.jpeg'
     )
-    visualize_image(args.data_path)
+
+    print(
+        get_image_shape(image_path)
+    )
+    visualize_image(image_path)
