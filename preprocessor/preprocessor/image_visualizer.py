@@ -24,4 +24,9 @@ if __name__ == '__main__':
             args.data_path
         )
     )
-    visualize_image(args.data_path)
+    visualize_image(
+        os.path.join(
+            args.data_path,
+            'train/normal/NORMAL2-IM-0856-0001.jpeg'
+        )
+    )
