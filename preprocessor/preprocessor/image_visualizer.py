@@ -1,10 +1,7 @@
 import os
 
-import numpy
-
 from utilities import argument_parser
 
-import matplotlib.pyplot as plt
 from PIL import Image
 
 def path_sanity_check(image_path):
