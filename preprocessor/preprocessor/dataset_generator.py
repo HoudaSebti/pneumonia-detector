@@ -22,7 +22,7 @@ def generate_dataset(dataset_type, data_path=None):
     args = argument_parser.parse_args()
     if data_path is None: 
         data_path = args.data_path
-    images_paths = np.vstack(
+    images_paths = np.stack(
         [
             glob.glob(
                 os.path.join(
@@ -31,7 +31,8 @@ def generate_dataset(dataset_type, data_path=None):
                     '%s/*.jpeg' %pathology
                 ) 
             ) for pathology in ['normal', 'pneumonia']
-        ]
+        ],
+        axis=0
     )
     return pd.Dataframe(
         data={
