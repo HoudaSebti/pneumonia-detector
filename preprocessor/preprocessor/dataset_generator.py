@@ -12,12 +12,12 @@ class Dataset_type(Enum):
     TEST = 'test'
     VAL = 'val'
 
-def sanity_check(data_set_type):
-    if not isinstance(data_set_type, Dataset_type):
-        raise TypeError('the dataset type shoud be an instance od Fataset_type class !')
+def sanity_check(dataset_type):
+    if not isinstance(dataset_type, Dataset_type):
+        raise TypeError('the dataset type shoud be an instance of Dataset_type class !')
 
-def generate_dataset(data_set_type, data_path=None):
-    sanity_check(data_set_type)
+def generate_dataset(dataset_type, data_path=None):
+    sanity_check(dataset_type)
     args = argument_parser.parse_args()
     if data_path is None: 
         data_path = args.data_path
@@ -26,7 +26,7 @@ def generate_dataset(data_set_type, data_path=None):
             glob.glob(
                 os.path.join(
                     data_path,
-                    data_set_type.value,
+                    dataset_type.value,
                     '%s/*.jpeg' %pathology
                 ) 
             ) for pathology in ['normal', 'pneumonia']
