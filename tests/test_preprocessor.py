@@ -2,11 +2,18 @@ import unittest
 
 import os
 
-from preprocessor import image_visualizer
+from preprocessor import image_visualizer, dataset_generator
 from utilities import argument_parser
 
 
 class TestPreprocessorFuncs(unittest.TestCase):
+    def test_data_set_generator(self):
+        self.assertEqual(
+            dataset_generator.generate_dataset(
+                dataset_generator.Dataset_type.TRAIN
+            ).shape,
+            (5216, 2)
+        )
     def test_path_sanity_check(self):
         try:
             image_visualizer.path_sanity_check(
