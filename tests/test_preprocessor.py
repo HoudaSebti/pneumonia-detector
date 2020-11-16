@@ -10,7 +10,8 @@ class TestPreprocessorFuncs(unittest.TestCase):
     def test_data_set_generator(self):
         self.assertEqual(
             dataset_generator.generate_dataset(
-                dataset_generator.Dataset_type.TRAIN
+                dataset_generator.Dataset_type.TRAIN,
+                adjusted=False
             ).shape,
             (5216, 2)
         )
@@ -19,7 +20,7 @@ class TestPreprocessorFuncs(unittest.TestCase):
             image_visualizer.path_sanity_check(
                 os.path.join(
                     args.data_path,
-                    'train/pneumonia/person993_bacteria_2000921.jpeg'
+                    'train/pneumonia/person9_bacteria_41.jpeg'
                 )
             )
         except Exception:
