@@ -45,6 +45,3 @@ def build_model(input_shape):
     return model
 
 
-model =  build_model()
-model.summary()
-
