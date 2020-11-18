@@ -11,7 +11,8 @@ class TestPreprocessorFuncs(unittest.TestCase):
         self.assertEqual(
             dataset_generator.generate_dataset(
                 dataset_generator.Dataset_type.TRAIN,
-                adjusted=False
+                224,
+                224
             ).shape,
             (5216, 2)
         )
@@ -30,3 +31,4 @@ class TestPreprocessorFuncs(unittest.TestCase):
 if __name__ == '__main__':
     args = argument_parser.parse_args()
     unittest.main( )
+    
