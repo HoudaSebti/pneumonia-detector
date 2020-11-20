@@ -11,6 +11,7 @@ from keras.optimizers import Adam, SGD, RMSprop
 from keras.callbacks import ModelCheckpoint, Callback, EarlyStopping
 
 def build_model(input_shape):
+    #use the sequential thing
     input_img = Input(shape=input_shape, name='ImageInput')
     x = Conv2D(64, (3,3), activation='relu', padding='same', name='Conv1_1')(input_img)
     x = Conv2D(64, (3,3), activation='relu', padding='same', name='Conv1_2')(x)
