@@ -74,7 +74,7 @@ def adjust_dataset(dataset, x_size, y_size, augmentation_techs=None, with_normal
             )
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         if with_normalization : image = image.astype(np.float32)/255.
-        if augmentation_techs is not None and in_minority(image_label, cases_count):
+        if augmentation_techs is not None:
             new_images, new_labels = augment_image(
                 image,
                 image_label,
@@ -95,10 +95,11 @@ def update_data(images_arrays, images_labels, new_images, new_labels):
     images_arrays.extend(new_images)
     images_labels.extend(
         [
-            to_categorical(
-                image_label,
-                num_classes=2
-            ) for image_label in new_labels
+            #to_categorical(
+            #    image_label,
+            #    num_classes=2
+            #) for image_label in new_labels
+            image_label
         ]
     )
     
