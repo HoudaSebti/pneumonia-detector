@@ -4,7 +4,7 @@ from skimage import exposure
 import matplotlib.pyplot as plt
 
 
-def extract_features_hog(image, orientations=8, pixels_per_cell=(16, 16), cells_per_block=(1,1),visualize=True, multichannel=True, feature_vector=True):
+def extract_features_hog(image, orientations=8, pixels_per_cell=(16, 16), cells_per_block=(1,1),visualize=False, multichannel=True, feature_vector=True):
     return hog(
         image,
         orientations=orientations,

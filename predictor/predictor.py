@@ -9,14 +9,15 @@ import os
 
 def svm_main(args, train_images, train_labels, test_images, test_labels, val_images, val_labels):
     feature_vectors = {}
+
     for images, key in zip([train_images, test_images, val_images], ['train', 'test', 'val']):
-        feature_vectors[key], _ = [
+        feature_vectors[key] = [
             feature_extractors.extract_features_hog(
                 image
-            ) for image in images
+            )[0] for image in images
         ]
 
-    return None
+    return feature_vectors
 
 def deep_learning_main():
     #model=deep_learning_predictor.build_model((224,224,3))
