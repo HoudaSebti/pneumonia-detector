@@ -3,7 +3,7 @@ from utilities import argument_parser
 from preprocessor import dataset_generator
 
 from skimage.io import imread, imshow
-from sklearn.decomposition import pca
+from sklearn.decomposition import PCA
 
 import os
 

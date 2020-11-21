@@ -28,7 +28,7 @@ def generate_full_dataset(augmentation_techs=None):
     images, labels = {}, {}
     for dataset_type in [Dataset_type.TRAIN, Dataset_type.TEST, Dataset_type.VAL]:
         dataset_type_imgs, dataset_type_labels = generate_dataset(
-            Dataset_type.TRAIN,
+            dataset_type,
             augmentation_techs
         )
         images[dataset_type.value] = dataset_type_imgs
@@ -76,14 +76,7 @@ def adjust_dataset(dataset, x_size, y_size, augmentation_techs=None, with_normal
             cv2.imread(image_path),
             (x_size, y_size)
         )
-        if image.shape[2] == 1:
-            image = np.dstack(
-                [
-                    image,
-                    image,
-                    image
-                ]
-            )
+
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         if with_normalization : image = image.astype(np.float32)/255.
         if augmentation_techs is not None:
