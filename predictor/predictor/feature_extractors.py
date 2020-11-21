@@ -28,4 +28,4 @@ def visualize_hog_image(input_image, hog_image, title):
     ax2.axis('off')
     ax2.imshow(hog_image_rescaled, cmap=plt.cm.gray)
     ax2.set_title(title)
-    plt.show()
+    
