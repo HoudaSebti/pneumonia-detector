@@ -111,7 +111,7 @@ def update_data(images_arrays, images_labels, new_images, new_labels):
             #    image_label,
             #    num_classes=2
             #) for image_label in new_labels
-            image_label
+            new_labels
         ]
     )
     
