@@ -1,21 +1,26 @@
+import numpy as np
+
 from predictor import deep_learning_predictor, feature_extractors
 from utilities import argument_parser
 from preprocessor import dataset_generator
 
 from skimage.io import imread, imshow
 from sklearn.decomposition import PCA
+from sklearn.svm import SVC
 
 import os
 
 def svm_main(args, train_images, train_labels, test_images, test_labels, val_images, val_labels):
     feature_vectors = {}
-
+    
     for images, key in zip([train_images, test_images, val_images], ['train', 'test', 'val']):
-        feature_vectors[key] = [
-            feature_extractors.extract_features_hog(
-                image
-            )[0] for image in images
-        ]
+        feature_vectors[key] = np.array(
+            [
+                feature_extractors.extract_features_hog(
+                    image
+                ) for image in images
+            ]
+        )
 
     return feature_vectors
 
