@@ -12,13 +12,7 @@ def svm_main(args, train_images, train_labels, test_images, test_labels, val_ima
     for images, key in zip([train_images, test_images, val_images], ['train', 'test', 'val']):
         feature_vectors[key], _ = [
             feature_extractors.extract_features_hog(
-                image,
-                orientations=8,
-                pixels_per_cell=(16, 16),
-                cells_per_block=(1,1),
-                visualize=True,
-                multichannel=False,
-                feature_vector=True
+                image
             ) for image in images
         ]
 
