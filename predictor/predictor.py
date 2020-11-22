@@ -32,22 +32,11 @@ def deep_learning_main():
 if __name__ == '__main__':
     args = argument_parser.parse_args()
     images, labels = dataset_generator.generate_full_dataset(
-        dataset_generator.generate_augmentation_sequence(
-            [
-                'Fliplr',
-                'Affine',
-                'Multiply'
-            ],
-            [
-                {},
-                {
-                    'rotate' : 20
-                },
-                {
-                    'mul' : (1.2, 1.5)
-                }
-            ]
-        )
+        rotation_range=90,
+        brightness_range=(0.3,0.8),
+        horizontal_flip=True,
+        height_shift_range=0.2,
+        fill_mode='constant'
     )
 
     svm_main(

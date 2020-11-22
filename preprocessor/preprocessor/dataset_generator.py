@@ -3,6 +3,8 @@ import pandas as pd
 
 import cv2
 from keras.utils import to_categorical
+from keras.preprocessing.image import ImageDataGenerator
+from skimage import io
 import imgaug.augmenters as iaa
 
 from enum import Enum
@@ -24,7 +26,7 @@ def sanity_check(dataset_type):
     if not isinstance(dataset_type, Dataset_type):
         raise TypeError('the dataset type shoud be an instance of Dataset_type class !')
 
-def generate_full_dataset(augmentation_techs=None):
+def generate_full_dataset(**augmentation_techs=None):
     images, labels = {}, {}
     for dataset_type in [Dataset_type.TRAIN, Dataset_type.TEST, Dataset_type.VAL]:
         dataset_type_imgs, dataset_type_labels = generate_dataset(
@@ -72,19 +74,22 @@ def adjust_dataset(dataset, x_size, y_size, augmentation_techs=None, with_normal
     images_arrays, images_labels = [], []
     cases_count = dataset['labels'].value_counts().to_dict()
     for image_path, image_label in zip(dataset['images_paths'], dataset['labels']):
-        image = cv2.resize(
-            cv2.imread(image_path),
-            (x_size, y_size)
-        )
 
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image = np.reshape(
+            cv2.resize(
+                cv2.imread(image_path),
+                (x_size, y_size)
+            ),
+            (1, ) + (x_size, y_size, 3)
+        )
         if with_normalization : image = image.astype(np.float32)/255.
         if augmentation_techs is not None:
+            datagen = ImageDataGenerator(**augmentation_techs)
             new_images, new_labels = augment_image(
                 image,
                 image_label,
-                get_augmentation_number(cases_count),
-                augmentation_techs
+                datagen
             )
         else:
             new_images, new_labels = [image], [image_label]
@@ -123,17 +128,18 @@ def get_augmentation_number(cases_count):
         np.max(count_vals) / np.min(count_vals)
     )
 
-def augment_image(image, label, augmentation_number, augmentation_techs, with_normalization=True):
+def augment_image(image, label, datagen, batch_size=16, batches_num=10, with_normalization=True):
+    batches=0
+    images, labels = [image], [label]
+    for image_batch, label_batch in datagen.flow(image, batch_size=batch_size):
+        images.append(image_batch.astype(np.float32)/255. if with_normalization else image_batch)
+        labels.append(label_batch.astype(np.float32)/255. if with_normalization else label_batch)
+        batches += 1
+        if batches > batches_num:
+            break
     return (
-        [
-            cv2.cvtColor(
-                augmentation_techs.augment_image(image),
-                cv2.COLOR_BGR2RGB
-            ).astype(np.float32)/255. for _ in range(augmentation_number)
-        ],
-        [
-            label for _ in range(augmentation_number)
-        ]
+        images,
+        labels
     )
 
 def generate_augmentation_sequence(augmentation_techniques, aug_techs_params):
