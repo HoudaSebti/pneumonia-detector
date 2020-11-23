@@ -26,15 +26,15 @@ def sanity_check(dataset_type):
     if not isinstance(dataset_type, Dataset_type):
         raise TypeError('the dataset type shoud be an instance of Dataset_type class !')
 
-def generate_full_dataset(**augmentation_techs=None):
+def generate_full_dataset():
     images, labels = {}, {}
     for dataset_type in [Dataset_type.TRAIN, Dataset_type.TEST, Dataset_type.VAL]:
         dataset_type_imgs, dataset_type_labels = generate_dataset(
             dataset_type,
             augmentation_techs
         )
-        images[dataset_type.value] = dataset_type_imgs
-        labels[dataset_type.value] = dataset_type_labels
+        images[dataset_type] = dataset_type_imgs
+        labels[dataset_type] = dataset_type_labels
 
     return images, labels
 
@@ -54,27 +54,22 @@ def generate_dataset(dataset_type, augmentation_techs=None, x_size=224, y_size=2
             ) for pathology in ['normal', 'pneumonia']
         ]
     )
-    return adjust_dataset(
-        pd.DataFrame(
-            data={
-                'images_paths' : images_paths,
-                'labels' : np.array(
-                    [
-                        0 if 'normal' in image_path else 1 for image_path in images_paths
-                    ]
-                )
-            }
-        ),
-        x_size,
-        y_size,
-        augmentation_techs=augmentation_techs
-    )
 
-def adjust_dataset(dataset, x_size, y_size, augmentation_techs=None, with_normalization=True):
-    images_arrays, images_labels = [], []
-    cases_count = dataset['labels'].value_counts().to_dict()
-    for image_path, image_label in zip(dataset['images_paths'], dataset['labels']):
+    return (
+        adjust_dataset(
+            images_paths,
+            x_size,
+            y_size,
+        ), np.array(
+            [
+                0 if 'normal' in image_path else 1 for image_path in images_paths
+            ]
+        )
+    )       
 
+def adjust_dataset(images_paths, x_size, y_size, with_normalization=True):
+    images_arrays = []
+    for image_path in images_paths:
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image = np.reshape(
             cv2.resize(
@@ -84,85 +79,30 @@ def adjust_dataset(dataset, x_size, y_size, augmentation_techs=None, with_normal
             (1, ) + (x_size, y_size, 3)
         )
         if with_normalization : image = image.astype(np.float32)/255.
-        if augmentation_techs is not None:
-            datagen = ImageDataGenerator(**augmentation_techs)
-            new_images, new_labels = augment_image(
-                image,
-                image_label,
-                datagen
-            )
-        else:
-            new_images, new_labels = [image], [image_label]
-        update_data(
-            images_arrays,
-            images_labels,
-            new_images,
-            new_labels
-        )
-    return np.array(images_arrays), np.array(images_labels)
+        images_arrays.append(image)
+    return np.array(images_arrays)
 
-def update_data(images_arrays, images_labels, new_images, new_labels):
-    images_arrays.extend(new_images)
-    images_labels.extend(
-        [
-            #to_categorical(
-            #    image_label,
-            #    num_classes=2
-            #) for image_label in new_labels
-            new_labels
-        ]
+def get_augmented_data(images_arrays, images_labels, batch_size=16, batch_number=500, **augmentation_techs):
+    datagen = ImageDataGenerator(**augmentation_techs)
+    return augment_images(
+        images_arrays,
+        images_labels,
+        datagen,
+        bacth_size,
+        batch_number
     )
     
-def generate_augmentation_technique(technique_name, technique_params):
-    return getattr(
-        sys.modules['imgaug.augmenters'],
-        technique_name
-    )(**technique_params)
-
-def in_minority(label, cases_count):
-    return cases_count[label] < cases_count[1 - label]
-
-def get_augmentation_number(cases_count):
-    count_vals = list(cases_count.values())
-    return int(
-        np.max(count_vals) / np.min(count_vals)
-    )
-
-def augment_image(image, label, datagen, batch_size=16, batches_num=10, with_normalization=True):
+def augment_images(images, labels, datagen, batch_size, batches_num, with_normalization=True):
     batches=0
-    images, labels = [image], [label]
     for image_batch, label_batch in datagen.flow(image, batch_size=batch_size):
-        images.append(image_batch.astype(np.float32)/255. if with_normalization else image_batch)
-        labels.append(label_batch.astype(np.float32)/255. if with_normalization else label_batch)
-        batches += 1
-        if batches > batches_num:
-            break
-    return (
-        images,
-        labels
-    )
-
-def generate_augmentation_sequence(augmentation_techniques, aug_techs_params):
-    return iaa.OneOf(
-        [
-            generate_augmentation_technique(
-                technique_name,
-                technique_params
-            ) for technique_name, technique_params in zip(augmentation_techniques, aug_techs_params)
-        ]
-    )
-
-def get_batches_generator(images, labels, batch_size=16):
-    indices = np.random.choice(
-        range(images.shape[0]),
-        batch_size
-    )
-    for i in range(images.shape[0] // batch_size):
-        print('generating batch number: %s' %str(i))
-        yield (
-            images[indices],
-            labels[indices]
+        yield
+        (
+            image_batch.astype(np.float32)/255. if with_normalization else image_batch,
+            label_batch
         )
+        batches += 1
+        if batches == batches_num:
+            break
 
 def visualize_dataset_histogram(dataset_type):
     dataset = generate_dataset(dataset_type)

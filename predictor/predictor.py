@@ -13,13 +13,29 @@ import os
 def svm_main(args, train_images, train_labels, test_images, test_labels, val_images, val_labels):
     feature_vectors = {}
     
-    for images, key in zip([train_images, test_images, val_images], ['train', 'test', 'val']):
-        feature_vectors[key] = np.array(
-            [
-                feature_extractors.extract_features_hog(
-                    image
-                ) for image in images
-            ]
+    augmented_data_generator = dataset_generator.get_augmented_data(
+        train_images,
+        train_labels,
+        16,
+        500,
+        rotation_range=90,
+        brightness_range=(0.3,0.8),
+        horizontal_flip=True,
+        height_shift_range=0.2,
+        fill_mode='constant'
+    )
+    model = SVC(
+            C=.01,
+            kernel = 'rbf',
+            gamma = .01,
+            class_weight = 'imbalanced'
+    )
+    for batch_images, batch_labels in augmented_data_generator:
+        model.fit(
+            feature_extractors.extract_batch_hog_features(
+                batch_images
+            ),
+            train_labels
         )
 
     return feature_vectors
@@ -31,13 +47,8 @@ def deep_learning_main():
 
 if __name__ == '__main__':
     args = argument_parser.parse_args()
-    images, labels = dataset_generator.generate_full_dataset(
-        rotation_range=90,
-        brightness_range=(0.3,0.8),
-        horizontal_flip=True,
-        height_shift_range=0.2,
-        fill_mode='constant'
-    )
+    images, labels = dataset_generator.generate_full_dataset()
+    
 
     svm_main(
         args,
