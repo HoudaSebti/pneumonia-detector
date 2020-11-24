@@ -11,8 +11,6 @@ from sklearn.svm import SVC
 import os
 
 def svm_main(args, train_images, train_labels, test_images, test_labels, val_images, val_labels):
-    feature_vectors = {}
-    
     augmented_data_generator = dataset_generator.get_augmented_data(
         train_images,
         train_labels,
@@ -28,7 +26,10 @@ def svm_main(args, train_images, train_labels, test_images, test_labels, val_ima
             C=.01,
             kernel = 'rbf',
             gamma = .01,
-            class_weight = 'imbalanced'
+            class_weight = {
+                0 : train_labels.shape[0] / np.sum(train_labels) - 1.,
+                1 : 1.,
+            }
     )
     for batch_images, batch_labels in augmented_data_generator:
         model.fit(
@@ -38,7 +39,7 @@ def svm_main(args, train_images, train_labels, test_images, test_labels, val_ima
             train_labels
         )
 
-    return feature_vectors
+    return None
 
 def deep_learning_main():
     #model=deep_learning_predictor.build_model((224,224,3))
