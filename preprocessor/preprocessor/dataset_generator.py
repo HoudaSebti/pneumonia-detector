@@ -97,8 +97,7 @@ def get_augmented_data(images_arrays, images_labels, batch_size=16, batch_number
 def augment_images(images, labels, datagen, batch_size, batches_num, with_normalization=True):
     batches=0
     for image_batch, label_batch in datagen.flow(images, labels, batch_size=batch_size):
-        yield
-        (
+        yield (
             image_batch.astype(np.float32)/255. if with_normalization else image_batch,
             label_batch
         )
