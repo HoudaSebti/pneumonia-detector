@@ -9,6 +9,8 @@ from sklearn.decomposition import PCA
 from sklearn.svm import SVC
 from sklearn.metrics import plot_confusion_matrix
 
+import matplotlib.pyplot as plt
+
 import os
 
 def svm_main(args, train_images, train_labels, test_images, test_labels, val_images, val_labels):
