@@ -72,10 +72,13 @@ def generate_dataset(dataset_type, x_size, y_size, data_path):
 def adjust_dataset(images_paths, x_size, y_size, with_normalization=True):
     images_arrays = []
     for image_path in images_paths:
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image = cv2.cvtColor(
+            cv2.imread(image_path),
+            cv2.COLOR_BGR2RGB
+        )
         image = np.reshape(
             cv2.resize(
-                cv2.imread(image_path),
+                image,
                 (x_size, y_size)
             ),
             (1, ) + (x_size, y_size, 3)
@@ -90,7 +93,7 @@ def get_augmented_data(images_arrays, images_labels, batch_size=16, batch_number
         images_arrays,
         images_labels,
         datagen,
-        bacth_size,
+        batch_size,
         batch_number
     )
     
