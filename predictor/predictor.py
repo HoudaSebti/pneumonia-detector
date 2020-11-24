@@ -14,7 +14,7 @@ def svm_main(args, train_images, train_labels, test_images, test_labels, val_ima
     augmented_data_generator = dataset_generator.get_augmented_data(
         train_images,
         train_labels,
-        16,
+        32,
         500,
         rotation_range=90,
         brightness_range=(0.3,0.8),
@@ -36,7 +36,7 @@ def svm_main(args, train_images, train_labels, test_images, test_labels, val_ima
             feature_extractors.extract_batch_hog_features(
                 batch_images
             ),
-            train_labels
+            batch_labels
         )
 
     return None
