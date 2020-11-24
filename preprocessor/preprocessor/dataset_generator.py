@@ -26,19 +26,21 @@ def sanity_check(dataset_type):
     if not isinstance(dataset_type, Dataset_type):
         raise TypeError('the dataset type shoud be an instance of Dataset_type class !')
 
-def generate_full_dataset():
+def generate_full_dataset(x_size=224, y_size=224, data_path=None):
     images, labels = {}, {}
     for dataset_type in [Dataset_type.TRAIN, Dataset_type.TEST, Dataset_type.VAL]:
         dataset_type_imgs, dataset_type_labels = generate_dataset(
             dataset_type,
-            augmentation_techs
+            x_size,
+            y_size,
+            data_path
         )
         images[dataset_type] = dataset_type_imgs
         labels[dataset_type] = dataset_type_labels
 
     return images, labels
 
-def generate_dataset(dataset_type, augmentation_techs=None, x_size=224, y_size=224, data_path=None):
+def generate_dataset(dataset_type, x_size, y_size, data_path):
     sanity_check(dataset_type)
     args = argument_parser.parse_args()
     if data_path is None: 
