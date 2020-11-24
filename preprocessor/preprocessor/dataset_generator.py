@@ -76,12 +76,9 @@ def adjust_dataset(images_paths, x_size, y_size, with_normalization=True):
             cv2.imread(image_path),
             cv2.COLOR_BGR2RGB
         )
-        image = np.reshape(
-            cv2.resize(
-                image,
-                (x_size, y_size)
-            ),
-            (1, ) + (x_size, y_size, 3)
+        image = cv2.resize(
+            image,
+            (x_size, y_size)
         )
         if with_normalization : image = image.astype(np.float32)/255.
         images_arrays.append(image)
