@@ -53,12 +53,12 @@ if __name__ == '__main__':
 
     svm_main(
         args,
-        images['train'],
-        labels['train'],
-        images['test'],
-        labels['test'],
-        images['val'],
-        labels['val']
+        images[dataset_generator.Dataset_type.TRAIN],
+        labels[dataset_generator.Dataset_type.TRAIN],
+        images[dataset_generator.Dataset_type.TEST],
+        labels[dataset_generator.Dataset_type.TEST],
+        images[dataset_generator.Dataset_type.VAL],
+        labels[dataset_generator.Dataset_type.VAL]
     )
 
 

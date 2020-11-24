@@ -1,7 +1,8 @@
 from skimage.feature import hog
-
 from skimage import exposure
 import matplotlib.pyplot as plt
+
+import numpy as np
 
 
 def extract_hog_features(image, orientations=8, pixels_per_cell=(16, 16), cells_per_block=(1,1),visualize=False, multichannel=True, feature_vector=True):
