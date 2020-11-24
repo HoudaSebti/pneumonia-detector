@@ -7,6 +7,7 @@ from preprocessor import dataset_generator
 from skimage.io import imread, imshow
 from sklearn.decomposition import PCA
 from sklearn.svm import SVC
+from sklearn.metrics import plot_confusion_matrix
 
 import os
 
@@ -38,7 +39,8 @@ def svm_main(args, train_images, train_labels, test_images, test_labels, val_ima
             ),
             batch_labels
         )
-
+    plot_confusion_matrix(model, test_images, test_labels)
+    plt.show()
     return None
 
 def deep_learning_main():
