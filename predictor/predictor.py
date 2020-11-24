@@ -39,7 +39,11 @@ def svm_main(args, train_images, train_labels, test_images, test_labels, val_ima
             ),
             batch_labels
         )
-    plot_confusion_matrix(model, test_images, test_labels)
+    plot_confusion_matrix(
+        model,
+        feature_extractors.extract_batch_hog_features(test_images),
+        test_labels
+    )
     plt.show()
     return None
 
