@@ -29,10 +29,7 @@ def svm_main(args, train_images, train_labels, test_images, test_labels, val_ima
             C=.01,
             kernel = 'rbf',
             gamma = .01,
-            class_weight = {
-                0 : train_labels.shape[0] / np.sum(train_labels) - 1.,
-                1 : 1.,
-            }
+            class_weight = 'balanced'
     )
     for batch_images, batch_labels in augmented_data_generator:
         model.fit(
@@ -41,13 +38,13 @@ def svm_main(args, train_images, train_labels, test_images, test_labels, val_ima
             ),
             batch_labels
         )
+
     plot_confusion_matrix(
         model,
         feature_extractors.extract_batch_hog_features(test_images),
         test_labels
     )
     plt.show()
-    return None
 
 def deep_learning_main():
     #model=deep_learning_predictor.build_model((224,224,3))
@@ -56,8 +53,7 @@ def deep_learning_main():
 
 if __name__ == '__main__':
     args = argument_parser.parse_args()
-    images, labels = dataset_generator.generate_full_dataset()
-    
+    images, labels = dataset_generator.generate_full_dataset(x_size=224, y_size=224)   
 
     svm_main(
         args,

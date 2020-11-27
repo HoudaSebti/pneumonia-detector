@@ -5,7 +5,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def extract_hog_features(image, orientations=8, pixels_per_cell=(16, 16), cells_per_block=(1,1),visualize=False, multichannel=True, feature_vector=True):
+def extract_hog_features(image, orientations=9, pixels_per_cell=(8, 8), cells_per_block=(3,3),visualize=False, multichannel=False, feature_vector=True):
+    if len(image.shape) == 3 and image.shape[-1] == 1:
+        image = image.reshape((image.shape[0], image.shape[1]))
     return hog(
         image,
         orientations=orientations,
@@ -16,7 +18,7 @@ def extract_hog_features(image, orientations=8, pixels_per_cell=(16, 16), cells_
         feature_vector=feature_vector
     )
 
-def extract_batch_hog_features(batch_images, orientations=8, pixels_per_cell=(16, 16), cells_per_block=(1,1),visualize=False, multichannel=True, feature_vector=True):
+def extract_batch_hog_features(batch_images, orientations=9, pixels_per_cell=(8, 8), cells_per_block=(3, 3),visualize=False, multichannel=False, feature_vector=True):
     return np.array(
         [
             extract_hog_features(

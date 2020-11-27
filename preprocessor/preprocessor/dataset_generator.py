@@ -26,21 +26,22 @@ def sanity_check(dataset_type):
     if not isinstance(dataset_type, Dataset_type):
         raise TypeError('the dataset type shoud be an instance of Dataset_type class !')
 
-def generate_full_dataset(x_size=224, y_size=224, data_path=None):
+def generate_full_dataset(x_size, y_size, with_normalization=False, data_path=None):
     images, labels = {}, {}
     for dataset_type in [Dataset_type.TRAIN, Dataset_type.TEST, Dataset_type.VAL]:
         dataset_type_imgs, dataset_type_labels = generate_dataset(
             dataset_type,
             x_size,
             y_size,
-            data_path
+            data_path,
+            with_normalization=with_normalization
         )
         images[dataset_type] = dataset_type_imgs
         labels[dataset_type] = dataset_type_labels
 
     return images, labels
 
-def generate_dataset(dataset_type, x_size, y_size, data_path):
+def generate_dataset(dataset_type, x_size, y_size, data_path, with_normalization):
     sanity_check(dataset_type)
     args = argument_parser.parse_args()
     if data_path is None: 
@@ -62,6 +63,7 @@ def generate_dataset(dataset_type, x_size, y_size, data_path):
             images_paths,
             x_size,
             y_size,
+            with_normalization=with_normalization
         ), np.array(
             [
                 0 if 'normal' in image_path else 1 for image_path in images_paths
@@ -69,12 +71,12 @@ def generate_dataset(dataset_type, x_size, y_size, data_path):
         )
     )       
 
-def adjust_dataset(images_paths, x_size, y_size, with_normalization=True):
+def adjust_dataset(images_paths, x_size, y_size, with_normalization):
     images_arrays = []
     for image_path in images_paths:
         image = cv2.cvtColor(
             cv2.imread(image_path),
-            cv2.COLOR_BGR2RGB
+            cv2.cv2.COLOR_BGR2GRAY
         )
         image = cv2.resize(
             image,
@@ -94,9 +96,9 @@ def get_augmented_data(images_arrays, images_labels, batch_size=16, batch_number
         batch_number
     )
     
-def augment_images(images, labels, datagen, batch_size, batches_num, with_normalization=True):
+def augment_images(images, labels, datagen, batch_size, batches_num, with_normalization=False):
     batches=0
-    for image_batch, label_batch in datagen.flow(images, labels, batch_size=batch_size):
+    for image_batch, label_batch in datagen.flow(images.reshape((*images.shape, 1)), labels, batch_size=batch_size):
         yield (
             image_batch.astype(np.float32)/255. if with_normalization else image_batch,
             label_batch
@@ -105,8 +107,8 @@ def augment_images(images, labels, datagen, batch_size, batches_num, with_normal
         if batches == batches_num:
             break
 
-def visualize_dataset_histogram(dataset_type):
-    dataset = generate_dataset(dataset_type)
+def visualize_dataset_histogram(dataset_type, with_normalization):
+    dataset = generate_dataset(dataset_type, with_normalization)
     cases_count = dataset['labels'].value_counts()
     print(cases_count)
 
