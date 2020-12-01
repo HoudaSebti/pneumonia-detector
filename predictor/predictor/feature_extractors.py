@@ -47,13 +47,13 @@ def extract_wavelet_features(images_batch, wavelet_name, level):
     return np.array(
             [
                 np.hstack(
-                    (
+                    [
                         [
                             level_image_filter.flatten() for level_image_filter in level_image_filters
                         ] for level_image_filters in np.array(
                             pywt.wavedec2(image, wavelet_name, level=level)
                         )[1:]
-                    )
+                    ]
                 ).flatten() for image in images_batch
             ]
         )
