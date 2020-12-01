@@ -1,4 +1,6 @@
 from skimage.feature import hog
+import pywt
+
 from skimage import exposure
 import matplotlib.pyplot as plt
 
@@ -32,7 +34,31 @@ def extract_batch_hog_features(batch_images, orientations=9, pixels_per_cell=(8,
             ) for image in batch_images
         ]
     )
-        
+
+def extract_wavelet_features(images_batch, wavelet_name, level):
+    return np.array(
+        [
+            np.array(
+                pywt.wavedec2(image, wavelet_name, level=level)
+            )[1 : -1] for image in images_batch
+        ]
+    )
+
+
+def visualize_wavelet_transforms(image, wavelet_name, level):
+    titles = ['Approximation', ' Horizontal detail','Vertical detail', 'Diagonal detail']
+    fig = plt.figure(figsize=(12, 3))
+    for i in range(level):
+        coeffs = pywt.wavedec2(image, wavelet_name, level=i + 1)
+        for j, a in enumerate([coeffs[0], *coeffs[1]]):
+            ax = fig.add_subplot(level, 4, j + 1 + 4 * i )
+            ax.imshow(a, interpolation="nearest", cmap=plt.cm.gray)
+            ax.set_title(titles[j] + '_level_%s' %str(i + 1), fontsize=10)
+            ax.set_xticks([])
+            ax.set_yticks([])
+        fig.tight_layout()
+    plt.show()
+
 def visualize_hog_image(input_image, hog_image, title):
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8, 4), sharex=True, sharey=True)
 
