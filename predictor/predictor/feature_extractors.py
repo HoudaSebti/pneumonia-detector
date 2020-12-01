@@ -36,13 +36,27 @@ def extract_batch_hog_features(batch_images, orientations=9, pixels_per_cell=(8,
     )
 
 def extract_wavelet_features(images_batch, wavelet_name, level):
+    #return np.array(
+    #    [
+    #        np.array(
+    #            pywt.wavedec2(image, wavelet_name, level=level)
+    #        )[1:].flatten() for image in images_batch
+    #    ]
+    #)
+
     return np.array(
-        [
-            np.array(
-                pywt.wavedec2(image, wavelet_name, level=level)
-            )[1:].flatten() for image in images_batch
-        ]
-    )
+            [
+                np.hstack(
+                    (
+                        [
+                            level_image_filter.flatten() for level_image_filter in level_image_filters
+                        ] for level_image_filters in np.array(
+                            pywt.wavedec2(image, wavelet_name, level=level)
+                        )[1:]
+                    )
+                ).flatten() for image in images_batch
+            ]
+        )
 
 
 def visualize_wavelet_transforms(image, wavelet_name, level):
