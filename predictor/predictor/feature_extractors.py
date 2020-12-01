@@ -40,7 +40,7 @@ def extract_wavelet_features(images_batch, wavelet_name, level):
         [
             np.array(
                 pywt.wavedec2(image, wavelet_name, level=level)
-            )[1 : -1] for image in images_batch
+            )[1:].flatten() for image in images_batch
         ]
     )
 

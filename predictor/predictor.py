@@ -28,9 +28,9 @@ def svm_main_with_hog(args, train_images, train_labels, test_images, test_labels
         fill_mode='constant'
     )
     model = SVC(
-            C=.01,
+            C=.1,
             kernel = 'rbf',
-            gamma = .01,
+            gamma = .001,
             class_weight = 'balanced'
     )
     for batch_images, batch_labels in augmented_data_generator:
@@ -62,9 +62,9 @@ def svm_main_with_dwt(args, train_images, train_labels, test_images, test_labels
         fill_mode='constant'
     )
     model = SVC(
-            C=.01,
+            C=.1,
             kernel = 'rbf',
-            gamma = .01,
+            gamma = .001,
             class_weight = 'balanced'
     )
     for batch_images, batch_labels in augmented_data_generator:
