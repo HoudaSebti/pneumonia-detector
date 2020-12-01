@@ -73,7 +73,8 @@ def svm_main_with_dwt(args, train_images, train_labels, test_images, test_labels
                 batch_images,
                 wavelet_name,
                 level
-            )
+            ),
+            batch_labels
         )
     plot_confusion_matrix(
         model,
