@@ -24,7 +24,7 @@ def get_image_shape(image_path):
     return image.size
 
 def visualize_pneumonia_vs_normal_dwt(pneumonia_images, normal_images, figures_number, wavelet_name, level):
-    titles = [' Horizontal detail','Vertical detail', 'Diagonal detail']
+    titles = [' Horizontal','Vertical', 'Diagonal']
     pneumonia = random.sample(list(pneumonia_images), figures_number)
     normal = random.sample(list(normal_images), figures_number)
     for i in range(figures_number):
@@ -47,7 +47,7 @@ def visualize_pneumonia_vs_normal_dwt(pneumonia_images, normal_images, figures_n
                         interpolation="nearest",
                         cmap=plt.cm.gray
                     )
-                    ax.set_title(titles[k - 3 * idxj] + '_level_%s_%s' %(str(j + 1), 'normal' if idx == 0 else 'pneumonia'), fontsize=10)
+                    ax.set_title(titles[k - 3 * idx] + '_level_%s_%s' %(str(j + 1), 'normal' if idx == 0 else 'pneumonia'), fontsize=10)
                     ax.set_xticks([])
                     ax.set_yticks([])
             fig.tight_layout()
