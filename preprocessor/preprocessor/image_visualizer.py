@@ -47,7 +47,7 @@ def visualize_pneumonia_vs_normal_dwt(pneumonia_images, normal_images, figures_n
                         interpolation="nearest",
                         cmap=plt.cm.gray
                     )
-                    ax.set_title(titles[k - 3 * idxj] + '_level_%s_%s' %(str(j + 1), 'normal' id idx == 0 else 'pneumonia'), fontsize=10)
+                    ax.set_title(titles[k - 3 * idxj] + '_level_%s_%s' %(str(j + 1), 'normal' if idx == 0 else 'pneumonia'), fontsize=10)
                     ax.set_xticks([])
                     ax.set_yticks([])
             fig.tight_layout()
