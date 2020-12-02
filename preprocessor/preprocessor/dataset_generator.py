@@ -41,7 +41,7 @@ def generate_full_dataset(x_size, y_size, with_normalization=False, data_path=No
 
     return images, labels
 
-def generate_dataset(dataset_type, x_size, y_size, data_path, with_normalization):
+def generate_dataset(dataset_type, x_size, y_size, data_path=None, with_normalization=False):
     sanity_check(dataset_type)
     args = argument_parser.parse_args()
     if data_path is None: 

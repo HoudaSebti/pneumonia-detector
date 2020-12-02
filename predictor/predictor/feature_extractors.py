@@ -5,6 +5,7 @@ from skimage import exposure
 import matplotlib.pyplot as plt
 
 import numpy as np
+import random
 
 
 def extract_hog_features(image, orientations=9, pixels_per_cell=(8, 8), cells_per_block=(3,3),visualize=False, multichannel=False, feature_vector=True):
@@ -58,6 +59,31 @@ def extract_wavelet_features(images_batch, wavelet_name, level):
             ]
         )
 
+
+def visualize_pneumonia_vs_normal_dwt(pneumonia_images, normal_images, figures_number, wavelet_name, level):
+    pneumonia = random.sample(pneumonia_images, figures_number)
+    normal = random.sample(normal_images, figures_number)
+    for i in range(figures_number):
+        normal_dwt = pywt.wavedec2(normal[i], wavelet_name, level=level)
+        pneumonia_dwt = pywt.wavedec2(normal[i], wavelet_name, level=level)
+        fig = plt.figure(figsize=(12, 3))
+
+        for j in range(level):
+            images = np.stack(
+                [
+                    normal_dwt[level - j],
+                    pneumonia_dwt[level - j]
+                ]
+            )
+            for idx in range(images.shape[0]):
+                for k in range(3 * idx, 3 * (idx + 1)):
+                    ax = fig.add_subplot(level, 6, k + 1 + 6 * j )
+                    ax.imshow(
+                        images[idx][k],
+                        interpolation="nearest",
+                        cmap=plt.cm.gray
+                    )
+    plt.show()
 
 def visualize_wavelet_transforms(image, wavelet_name, level):
     titles = ['Approximation', ' Horizontal detail','Vertical detail', 'Diagonal detail']

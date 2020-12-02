@@ -67,15 +67,23 @@ def svm_main_with_dwt(args, train_images, train_labels, test_images, test_labels
             gamma = .001,
             class_weight = 'balanced'
     )
-    for batch_images, batch_labels in augmented_data_generator:
-        model.fit(
-            feature_extractors.extract_wavelet_features(
-                batch_images,
-                wavelet_name,
-                level
-            ),
-            batch_labels
-        )
+    #for batch_images, batch_labels in augmented_data_generator:
+    #    model.fit(
+    #        feature_extractors.extract_wavelet_features(
+    #            batch_images,
+    #            wavelet_name,
+    #            level
+    #        ),
+    #        batch_labels
+    #    )
+    model.fit(
+        feature_extractors.extract_wavelet_features(
+            train_images,
+            wavelet_name,
+            level
+        ),
+        train_labels
+    )
     plot_confusion_matrix(
         model,
         feature_extractors.extract_wavelet_features(
