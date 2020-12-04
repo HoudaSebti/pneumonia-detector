@@ -79,6 +79,7 @@ def get_wavelet_trans_histogram(image, histo_max, histo_min, bins_number):
             histo_max + step,
             step
         )   
+    #)[0]
     )
 
 def get_wavelet_transform(image, wavelet_name, level, wt_direction):
@@ -102,14 +103,34 @@ def visualize_hog_image(input_image, hog_image, title):
 
 
 if __name__ == '__main__':
+    figures_number = 10
     images, labels = dataset_generator.generate_dataset(
         dataset_generator.Dataset_type.TRAIN,
         224,
         224
-    ) 
+    )
+
     histos = get_batch_wavelet_histogram(
         images,
         'haar',
         1,
         Wt_direction.VERTICAL,
         10)
+    pneumonia_indices = random.sample(
+        list(enumerate(images[labels==1])),
+        figures_number
+    )
+    normal_indices = random.sample(
+        list(enumerate(images[labels==1])),
+        figures_number
+    )
+    for pneumonia_idx, normal_idx in zip(pneumonia_indices, normal_indices):
+        fig = plt.figure(figsize=(12, 3))
+        ax = fig.add_subplot(1, 2, 1)
+        ax.bar(histos[normal_idx][1], height=histos[normal_idx][0])
+        ax.set_title('normal histogram')
+        ax = fig.add_subplot(1, 2, 2)
+        ax.bar(histos[pneumonia_idx][1], height=histos[pneumonia_idx][0])
+        ax.set_title('pneumonia histogram')
+    plt.show()
+
