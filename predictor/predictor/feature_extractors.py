@@ -56,8 +56,11 @@ def get_batch_wavelet_histogram(images_batch, wavelet_name, level, wt_direction,
             ).flatten() for image in images_batch
         ]
     )
-    histo_min = np.min(wavelet_transforms)
-    histo_max = np.max(wavelet_transforms)
+    #histo_min = np.min(wavelet_transforms)
+    #histo_max = np.max(wavelet_transforms)
+    histo_min=np.percentile(wavelet_transforms, 1)
+    histo_max=np.percentile(wavelet_transforms, 99)
+
     return np.array(
         [
             get_wavelet_trans_histogram(
@@ -103,7 +106,7 @@ def visualize_hog_image(input_image, hog_image, title):
 
 
 def wavelet_trans_histos_main():
-    figures_number = 10
+    figures_number = 20
     images, labels = dataset_generator.generate_dataset(
         dataset_generator.Dataset_type.TRAIN,
         224,
@@ -127,10 +130,10 @@ def wavelet_trans_histos_main():
     for pneumonia_idx, normal_idx in zip(pneumonia_indices, normal_indices):
         fig = plt.figure(figsize=(12, 3))
         ax = fig.add_subplot(1, 2, 1)
-        ax.bar(histos[normal_idx, 1], height=histos[normal_idx, 0])
+        ax.bar(histos[normal_idx, 1][:-1], height=histos[normal_idx, 0], align='edge')
         ax.set_title('normal histogram')
         ax = fig.add_subplot(1, 2, 2)
-        ax.bar(histos[pneumonia_idx, 1], height=histos[pneumonia_idx, 0])
+        ax.bar(histos[pneumonia_idx, 1][:-1], height=histos[pneumonia_idx, 0], align='edge')
         ax.set_title('pneumonia histogram')
     plt.show()
 
