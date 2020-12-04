@@ -115,6 +115,7 @@ def augment_images(images, labels, datagen, batch_size, batches_num, with_normal
         if batches == batches_num:
             break
 
+
 def visualize_dataset_histogram(dataset_type, with_normalization):
     dataset = generate_dataset(dataset_type, with_normalization)
     cases_count = dataset['labels'].value_counts()

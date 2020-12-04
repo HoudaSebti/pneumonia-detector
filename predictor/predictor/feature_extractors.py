@@ -6,6 +6,15 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 import random
+import math
+from enum import Enum
+
+from preprocessor import dataset_generator
+
+class Wt_direction(Enum):
+    HORIZONTAL = 0
+    VERTICAL = 1
+    DIAGONAL = 2
 
 
 def extract_hog_features(image, orientations=9, pixels_per_cell=(8, 8), cells_per_block=(3,3),visualize=False, multichannel=False, feature_vector=True):
@@ -36,68 +45,46 @@ def extract_batch_hog_features(batch_images, orientations=9, pixels_per_cell=(8,
         ]
     )
 
-def extract_wavelet_features(images_batch, wavelet_name, level):
-    #return np.array(
-    #    [
-    #        np.array(
-    #            pywt.wavedec2(image, wavelet_name, level=level)
-    #        )[1:].flatten() for image in images_batch
-    #    ]
-    #)
-
+def get_batch_wavelet_histogram(images_batch, wavelet_name, level, wt_direction, bins_number):
+    wavelet_transforms = np.array(
+        [
+            get_wavelet_transform(
+                image,
+                wavelet_name,
+                level,
+                wt_direction
+            ).flatten() for image in images_batch
+        ]
+    )
+    histo_min = np.min(wavelet_transforms)
+    histo_max = np.max(wavelet_transforms)
     return np.array(
-            [
-                np.hstack(
-                    [
-                        [
-                            level_image_filter.flatten() for level_image_filter in level_image_filters
-                        ] for level_image_filters in np.array(
-                            pywt.wavedec2(image, wavelet_name, level=level)
-                        )[1:]
-                    ]
-                ).flatten() for image in images_batch
-            ]
-        )
+        [
+            get_wavelet_trans_histogram(
+                wavelet_transform,
+                histo_max,
+                histo_min,
+                bins_number
+            ) for wavelet_transform in wavelet_transforms
+        ]
+    )
+    
 
+def get_wavelet_trans_histogram(image, histo_max, histo_min, bins_number):
+    step = (histo_max - histo_min) / bins_number
+    return np.histogram(
+        image,
+        bins=np.arange(
+            histo_min,
+            histo_max + step,
+            step
+        )   
+    )
 
-def visualize_pneumonia_vs_normal_dwt(pneumonia_images, normal_images, figures_number, wavelet_name, level):
-    pneumonia = random.sample(pneumonia_images, figures_number)
-    normal = random.sample(normal_images, figures_number)
-    for i in range(figures_number):
-        normal_dwt = pywt.wavedec2(normal[i], wavelet_name, level=level)
-        pneumonia_dwt = pywt.wavedec2(normal[i], wavelet_name, level=level)
-        fig = plt.figure(figsize=(12, 3))
-
-        for j in range(level):
-            images = np.stack(
-                [
-                    normal_dwt[level - j],
-                    pneumonia_dwt[level - j]
-                ]
-            )
-            for idx in range(images.shape[0]):
-                for k in range(3 * idx, 3 * (idx + 1)):
-                    ax = fig.add_subplot(level, 6, k + 1 + 6 * j )
-                    ax.imshow(
-                        images[idx][k],
-                        interpolation="nearest",
-                        cmap=plt.cm.gray
-                    )
-    plt.show()
-
-def visualize_wavelet_transforms(image, wavelet_name, level):
-    titles = ['Approximation', ' Horizontal detail','Vertical detail', 'Diagonal detail']
-    fig = plt.figure(figsize=(12, 3))
-    for i in range(level):
-        coeffs = pywt.wavedec2(image, wavelet_name, level=i + 1)
-        for j, a in enumerate([coeffs[0], *coeffs[1]]):
-            ax = fig.add_subplot(level, 4, j + 1 + 4 * i )
-            ax.imshow(a, interpolation="nearest", cmap=plt.cm.gray)
-            ax.set_title(titles[j] + '_level_%s' %str(i + 1), fontsize=10)
-            ax.set_xticks([])
-            ax.set_yticks([])
-        fig.tight_layout()
-    plt.show()
+def get_wavelet_transform(image, wavelet_name, level, wt_direction):
+    if not isinstance(wt_direction, Wt_direction):
+        raise NotImplementedError('the wt_direction argument should an instance of class: feature_extractors.Wt_direction')
+    return pywt.wavedec2(image, wavelet_name, level=level)[1][wt_direction.value]
 
 def visualize_hog_image(input_image, hog_image, title):
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8, 4), sharex=True, sharey=True)
@@ -112,4 +99,17 @@ def visualize_hog_image(input_image, hog_image, title):
     ax2.axis('off')
     ax2.imshow(hog_image_rescaled, cmap=plt.cm.gray)
     ax2.set_title(title)
-    
+
+
+if __name__ == '__main__':
+    images, labels = dataset_generator.generate_dataset(
+        dataset_generator.Dataset_type.TRAIN,
+        224,
+        224
+    ) 
+    histos = get_batch_wavelet_histogram(
+        images,
+        'haar',
+        1,
+        Wt_direction.VERTICAL,
+        10)

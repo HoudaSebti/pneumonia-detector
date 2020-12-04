@@ -23,7 +23,7 @@ def get_image_shape(image_path):
     image = Image.open(image_path)
     return image.size
 
-def visualize_pneumonia_vs_normal_dwt(pneumonia_images, normal_images, figures_number, wavelet_name, level):
+def visualize_pneumonia_vs_normal_dwt(pneumonia_images, normal_images, figures_number, wavelet_name, level, use_haar_of_haar):
     titles = [' Horizontal','Vertical', 'Diagonal']
     pneumonia = random.sample(list(pneumonia_images), figures_number)
     normal = random.sample(list(normal_images), figures_number)
@@ -43,7 +43,11 @@ def visualize_pneumonia_vs_normal_dwt(pneumonia_images, normal_images, figures_n
                 for k in range(3 * idx, 3 * (idx + 1)):
                     ax = fig.add_subplot(level, 6, k + 1 + 6 * j )
                     ax.imshow(
-                        images[idx][k - 3 * idx],
+                        pywt.wavedec2(
+                            images[idx][k - 3 * idx],
+                            wavelet_name,
+                            level=level
+                        )[1][k - 3 * idx] if use_haar_of_haar else images[idx][k - 3 * idx] ,
                         interpolation="nearest",
                         cmap=plt.cm.gray
                     )
@@ -64,5 +68,6 @@ if __name__ == '__main__':
         images[labels == 0],
         10,
         'haar',
-        2
+        1,
+        True
     )
