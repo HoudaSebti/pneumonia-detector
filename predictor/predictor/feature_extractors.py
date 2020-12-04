@@ -45,7 +45,7 @@ def extract_batch_hog_features(batch_images, orientations=9, pixels_per_cell=(8,
         ]
     )
 
-def get_batch_wavelet_histogram(images_batch, wavelet_name, level, wt_direction, bins_number):
+def get_batch_wavelet_histogram(images_batch, wavelet_name, level, wt_direction, bins_number, just_histo=True):
     wavelet_transforms = np.array(
         [
             get_wavelet_transform(
@@ -67,23 +67,24 @@ def get_batch_wavelet_histogram(images_batch, wavelet_name, level, wt_direction,
                 wavelet_transform,
                 histo_max,
                 histo_min,
-                bins_number
+                bins_number,
+                just_histo
             ) for wavelet_transform in wavelet_transforms
         ]
     )
     
 
-def get_wavelet_trans_histogram(image, histo_max, histo_min, bins_number):
+def get_wavelet_trans_histogram(image, histo_max, histo_min, bins_number, just_histo=True):
     step = (histo_max - histo_min) / bins_number
-    return np.histogram(
+    histo = np.histogram(
         image,
         bins=np.arange(
             histo_min,
             histo_max + step,
             step
         )   
-    #)[0]
     )
+    return histo[0] if just_histo else histo
 
 def get_wavelet_transform(image, wavelet_name, level, wt_direction):
     if not isinstance(wt_direction, Wt_direction):
@@ -107,12 +108,21 @@ def visualize_hog_image(input_image, hog_image, title):
 
 def wavelet_trans_histos_main():
     figures_number = 20
-    images, labels = dataset_generator.generate_dataset(
-        dataset_generator.Dataset_type.TRAIN,
-        224,
-        224
+    train_images, train_labels = dataset_generator.generate_dataset(dataset_generator.Dataset_type.TRAIN,224,224)
+    test_images, test_labels = dataset_generator.generate_dataset(dataset_generator.Dataset_type.TRAIN,224,224)
+    images = np.stack(
+        [
+            train_images,
+            test_images
+        ],
+        axis=0
     )
-
+    labels = np.stack(
+        [
+            train_labels, test_labels
+        ],
+        axis=0
+    )
     histos = get_batch_wavelet_histogram(
         images,
         'haar',

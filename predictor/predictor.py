@@ -67,6 +67,19 @@ def svm_main_with_dwt(args, train_images, train_labels, test_images, test_labels
             gamma = .001,
             class_weight = 'balanced'
     )
+    wt_histos = feature_extractors.get_batch_wavelet_histogram(
+        np.concatenate(
+            (
+                train_images,
+                test_images
+            ),
+            axis=0
+        ),
+        'haar',
+        1,
+        feature_extractors.Wt_direction.VERTICAL,
+        10
+    )
     #for batch_images, batch_labels in augmented_data_generator:
     #    model.fit(
     #        feature_extractors.extract_wavelet_features(
@@ -77,17 +90,13 @@ def svm_main_with_dwt(args, train_images, train_labels, test_images, test_labels
     #        batch_labels
     #    )
     model.fit(
-        feature_extractors.extract_wavelet_features(
-            train_images,
-            wavelet_name,
-            level
-        ),
+        wt_histos[: train_images.shape[0] + 1],
         train_labels
     )
     plot_confusion_matrix(
         model,
         feature_extractors.extract_wavelet_features(
-            test_images,
+            wt_histos[train_images.shape[0]:],
             wavelet_name,
             level
         ),
