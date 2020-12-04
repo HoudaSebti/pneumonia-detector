@@ -75,8 +75,8 @@ def svm_main_with_dwt(args, train_images, train_labels, test_images, test_labels
             ),
             axis=0
         ),
-        'haar',
-        1,
+        wavelet_name,
+        level,
         feature_extractors.Wt_direction.VERTICAL,
         10
     )
@@ -90,7 +90,7 @@ def svm_main_with_dwt(args, train_images, train_labels, test_images, test_labels
     #        batch_labels
     #    )
     model.fit(
-        wt_histos[: train_images.shape[0] + 1],
+        wt_histos[: train_images.shape[0]],
         train_labels
     )
     plot_confusion_matrix(
@@ -122,7 +122,7 @@ if __name__ == '__main__':
         images[dataset_generator.Dataset_type.VAL],
         labels[dataset_generator.Dataset_type.VAL],
         'haar',
-        3
+        1
     )
 
 
