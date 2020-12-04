@@ -117,11 +117,11 @@ def wavelet_trans_histos_main():
         Wt_direction.VERTICAL,
         10)
     pneumonia_indices = random.sample(
-        list(enumerate(images[labels==1])),
+        list(range(images[labels==1].shape[0])),
         figures_number
     )
     normal_indices = random.sample(
-        list(enumerate(images[labels==0])),
+        list(range(images[labels==0].shape[0])),
         figures_number
     )
     for pneumonia_idx, normal_idx in zip(pneumonia_indices, normal_indices):
