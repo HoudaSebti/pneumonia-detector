@@ -49,7 +49,7 @@ def svm_main_with_hog(args, train_images, train_labels, test_images, test_labels
 
     plt.show()
 
-def svm_main_with_dwt(args, train_images, train_labels, test_images, test_labels, val_images, val_labels, wavelet_name, level):
+def svm_main_with_dwt(args, train_images, train_labels, test_images, test_labels, val_images, val_labels, wavelet_name, level, number_bins):
     augmented_data_generator = dataset_generator.get_augmented_data(
         train_images,
         train_labels,
@@ -78,7 +78,7 @@ def svm_main_with_dwt(args, train_images, train_labels, test_images, test_labels
         wavelet_name,
         level,
         feature_extractors.Wt_direction.VERTICAL,
-        10
+        number_bins
     )
     #for batch_images, batch_labels in augmented_data_generator:
     #    model.fit(
@@ -122,7 +122,8 @@ if __name__ == '__main__':
         images[dataset_generator.Dataset_type.VAL],
         labels[dataset_generator.Dataset_type.VAL],
         'haar',
-        1
+        1,
+        30
     )
 
 

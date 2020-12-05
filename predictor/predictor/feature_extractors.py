@@ -74,7 +74,7 @@ def get_batch_wavelet_histogram(images_batch, wavelet_name, level, wt_direction,
     )
     
 
-def get_wavelet_trans_histogram(image, histo_max, histo_min, bins_number, just_histo=True):
+def get_wavelet_trans_histogram(image, histo_max, histo_min, bins_number, just_histo):
     step = (histo_max - histo_min) / bins_number
     histo = np.histogram(
         image,
@@ -110,14 +110,14 @@ def wavelet_trans_histos_main():
     figures_number = 20
     train_images, train_labels = dataset_generator.generate_dataset(dataset_generator.Dataset_type.TRAIN,224,224)
     test_images, test_labels = dataset_generator.generate_dataset(dataset_generator.Dataset_type.TRAIN,224,224)
-    images = np.stack(
+    images = np.concatenate(
         [
             train_images,
             test_images
         ],
         axis=0
     )
-    labels = np.stack(
+    labels = np.concatenate(
         [
             train_labels, test_labels
         ],
@@ -128,7 +128,8 @@ def wavelet_trans_histos_main():
         'haar',
         1,
         Wt_direction.VERTICAL,
-        10)
+        30
+    )
     pneumonia_indices = random.sample(
         list(range(images[labels==1].shape[0])),
         figures_number
