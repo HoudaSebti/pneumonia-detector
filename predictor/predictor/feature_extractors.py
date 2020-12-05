@@ -128,7 +128,8 @@ def wavelet_trans_histos_main():
         'haar',
         1,
         Wt_direction.VERTICAL,
-        30
+        30,
+        False
     )
     pneumonia_indices = random.sample(
         list(range(images[labels==1].shape[0])),
