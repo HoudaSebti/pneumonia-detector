@@ -115,7 +115,7 @@ def wt_random_forest_main(train_images, train_labels, test_images, test_labels, 
         feature_extractors.Wt_direction.VERTICAL,
         number_bins
     )
-    clf = RandomForestClassifier(n_estimators=1000, max_depth=4)
+    clf = RandomForestClassifier(n_estimators=1000, max_depth=4, class_weight='balanced')
     clf.fit(
         wt_histos[: train_images.shape[0]],
         train_labels
