@@ -140,8 +140,6 @@ if __name__ == '__main__':
         labels[dataset_generator.Dataset_type.TRAIN],
         images[dataset_generator.Dataset_type.TEST],
         labels[dataset_generator.Dataset_type.TEST],
-        images[dataset_generator.Dataset_type.VAL],
-        labels[dataset_generator.Dataset_type.VAL],
         'haar',
         1,
         50
