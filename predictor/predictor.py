@@ -8,6 +8,7 @@ from skimage.io import imread, imshow
 from sklearn.decomposition import PCA
 from sklearn.svm import SVC
 from sklearn.metrics import plot_confusion_matrix
+from sklearn.ensemble import RandomForestClassifier
 
 import pywt
 
@@ -100,6 +101,32 @@ def svm_main_with_dwt(args, train_images, train_labels, test_images, test_labels
     )
     plt.show()
 
+def wt_random_forest_main(train_images, train_labels, test_images, test_labels, wavelet_name, level, number_bins):
+    wt_histos = feature_extractors.get_batch_wavelet_histogram(
+        np.concatenate(
+            (
+                train_images,
+                test_images
+            ),
+            axis=0
+        ),
+        wavelet_name,
+        level,
+        feature_extractors.Wt_direction.VERTICAL,
+        number_bins
+    )
+    clf = RandomForestClassifier(n_estimators=1000, max_depth=4)
+    clf.fit(
+        wt_histos[: train_images.shape[0]],
+        train_labels
+    )
+    plot_confusion_matrix(
+        clf,
+        wt_histos[train_images.shape[0]:],
+        test_labels
+    )
+    plt.show()
+
 def deep_learning_main():
     #model=deep_learning_predictor.build_model((224,224,3))
     #model.summary()
@@ -108,9 +135,7 @@ def deep_learning_main():
 if __name__ == '__main__':
     args = argument_parser.parse_args()
     images, labels = dataset_generator.generate_full_dataset(x_size=224, y_size=224)   
-
-    svm_main_with_dwt(
-        args,
+    wt_random_forest_main(
         images[dataset_generator.Dataset_type.TRAIN],
         labels[dataset_generator.Dataset_type.TRAIN],
         images[dataset_generator.Dataset_type.TEST],
@@ -121,7 +146,5 @@ if __name__ == '__main__':
         1,
         50
     )
-
-
 
 
