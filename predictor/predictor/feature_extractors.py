@@ -45,31 +45,40 @@ def extract_batch_hog_features(batch_images, orientations=9, pixels_per_cell=(8,
         ]
     )
 
-def get_batch_wavelet_histogram(images_batch, wavelet_name, level, wt_direction, bins_number, just_histo=True):
+def get_batch_wavelet_histogram(images_batch, wavelet_name, level, wt_directions, bins_number, just_histo=True):
     wavelet_transforms = np.array(
         [
-            get_wavelet_transform(
-                image,
-                wavelet_name,
-                level,
-                wt_direction
-            ).flatten() for image in images_batch
+            np.stack(
+                np.array(
+                    [
+                        get_wavelet_transform(
+                            image,
+                            wavelet_name,
+                            level,
+                            wt_direction
+                        ).flatten() for wt_direction in wt_directions
+                    ]
+                ),
+                axis=0
+            ) for image in images_batch
         ]
     )
-    #histo_min = np.min(wavelet_transforms)
-    #histo_max = np.max(wavelet_transforms)
     histo_min=np.percentile(wavelet_transforms, 1)
     histo_max=np.percentile(wavelet_transforms, 99)
 
     return np.array(
         [
-            get_wavelet_trans_histogram(
-                wavelet_transform,
-                histo_max,
-                histo_min,
-                bins_number,
-                just_histo
-            ) for wavelet_transform in wavelet_transforms
+            np.array(
+                [
+                    get_wavelet_trans_histogram(
+                        wavelet_transform,
+                        histo_max,
+                        histo_min,
+                        bins_number,
+                        just_histo
+                    ) for wavelet_transform in wavelet_transforms_arr
+                ]
+            ).flatten() for wavelet_transforms_arr in wavelet_transforms
         ]
     )
     

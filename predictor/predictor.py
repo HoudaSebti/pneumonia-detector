@@ -112,7 +112,10 @@ def wt_random_forest_main(train_images, train_labels, test_images, test_labels, 
         ),
         wavelet_name,
         level,
-        feature_extractors.Wt_direction.VERTICAL,
+        [
+            feature_extractors.Wt_direction.HORIZONTAL,
+            feature_extractors.Wt_direction.VERTICAL
+        ],
         number_bins
     )
     clf = RandomForestClassifier(n_estimators=1000, max_depth=4, class_weight='balanced')
