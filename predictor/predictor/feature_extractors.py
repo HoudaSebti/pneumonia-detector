@@ -90,7 +90,12 @@ def get_batch_wt_histos(images_batch, wavelet_name, levels, wt_directions, bins_
             bins_number,
             just_histo
         )
-    return batch_wt_histos
+    print('done getting wavelets')
+    return np.array(
+        [
+            image_wt_histo.flatten() for image_wt_histo in batch_wt_histos
+        ]
+    )
 
 def get_wt_histo(image, histo_max, histo_min, bins_number, just_histo):
     step = (histo_max - histo_min) / bins_number
