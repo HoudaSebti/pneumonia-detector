@@ -60,15 +60,16 @@ def get_batch_wt_histo_per_level(images_batch, wavelet_name, level, wt_direction
             ) for image in images_batch
         ]
     )
-
+    histo_max = np.percentile(wavelet_transforms, 99)
+    histo_min = np.percentile(wavelet_transforms, 1)
     return np.array(
         [
             np.array(
                 [
                     get_wt_histo(
                         image_direction_wt.flatten(),
-                        np.percentile(wavelet_transforms, 99),
-                        np.percentile(wavelet_transforms, 1),
+                        histo_max,
+                        histo_min,
                         bins_number,
                         just_histo
                     ) / image_direction_wt.size for image_direction_wt in image_wts
