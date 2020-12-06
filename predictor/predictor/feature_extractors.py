@@ -45,53 +45,52 @@ def extract_batch_hog_features(batch_images, orientations=9, pixels_per_cell=(8,
         ]
     )
 
-def get_batch_wavelet_histogram(images_batch, wavelet_name, levels, wt_directions, bins_number, just_histo=True):
+def get_batch_wt_histo_per_level(images_batch, wavelet_name, level, wt_directions, bins_number, just_histo):
     wavelet_transforms = np.array(
         [
-            np.stack(
+            np.array(
                 [
-                    np.stack(
-                        np.array(
-                            [
-                                get_wavelet_transform(
-                                    image,
-                                    wavelet_name,
-                                    level,
-                                    wt_direction
-                                ).flatten() for wt_direction in wt_directions
-                            ]
-                        ),
-                        axis=0
-                    ) for level in levels
+                    get_wavelet_transform(
+                        image,
+                        wavelet_name,
+                        level,
+                        wt_direction
+                    ) for wt_direction in wt_directions
                 ]
             ) for image in images_batch
         ]
     )
-    histo_min=np.percentile(wavelet_transforms, 1)
-    histo_max=np.percentile(wavelet_transforms, 99)
 
     return np.array(
         [
             np.array(
                 [
-                    np.array(
-                        [
-                            get_wavelet_trans_histogram(
-                                wavelet_transform,
-                                np.percentile(wavelet_transforms[:, level, :], 99),
-                                np.percentile(wavelet_transforms[:, level, :], 1),
-                                bins_number,
-                                just_histo
-                            ) for wavelet_transform in wavelet_transforms_arr
-                        ]
-                    ).flatten() for level in levels
+                    get_wt_histo(
+                        image_direction_wt.flatten(),
+                        np.percentile(wavelet_transforms, 99),
+                        np.percentile(wavelet_transforms, 1),
+                        bins_number,
+                        just_histo
+                    ) / image_direction_wt.size for image_direction_wt in image_wts
                 ]
-            ) for wavelet_transforms_arr in wavelet_transforms
+            ) for image_wts in wavelet_transforms
         ]
-    )
+    )    
     
+def get_batch_wt_histos(images_batch, wavelet_name, levels, wt_directions, bins_number, just_histo=True):
+    batch_wt_histos = np.zeros((images_batch.shape[0], levels.size, wt_directions.size, bins_number))
+    for level_idx, level in enumerate(levels):
+        batch_wt_histos[:, level_idx, :] = get_batch_wt_histo_per_level(
+            images_batch,
+            wavelet_name,
+            level,
+            wt_directions,
+            bins_number,
+            just_histo
+        )
+    return batch_wt_histos
 
-def get_wavelet_trans_histogram(image, histo_max, histo_min, bins_number, just_histo):
+def get_wt_histo(image, histo_max, histo_min, bins_number, just_histo):
     step = (histo_max - histo_min) / bins_number
     histo = np.histogram(
         image,
@@ -140,7 +139,7 @@ def wavelet_trans_histos_main():
         ],
         axis=0
     )
-    histos = get_batch_wavelet_histogram(
+    histos = get_batch_wt_histos(
         images,
         'haar',
         1,

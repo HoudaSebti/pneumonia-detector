@@ -68,7 +68,7 @@ def svm_main_with_dwt(args, train_images, train_labels, test_images, test_labels
             gamma = .001,
             class_weight = 'balanced'
     )
-    wt_histos = feature_extractors.get_batch_wavelet_histogram(
+    wt_histos = feature_extractors.get_batch_wt_histos(
         np.concatenate(
             (
                 train_images,
@@ -93,31 +93,34 @@ def svm_main_with_dwt(args, train_images, train_labels, test_images, test_labels
     )
     plt.show()
 
-def wt_random_forest_main(train_images, train_labels, test_images, test_labels, wavelet_name, level, number_bins):
-    wt_histos = feature_extractors.get_batch_wavelet_histogram(
-        np.concatenate(
-            (
-                train_images,
-                test_images
-            ),
-            axis=0
-        ),
+def wt_random_forest_main(train_images, train_labels, test_images, test_labels, wavelet_name, levels, wt_directions, number_bins):
+    train_wt_histos = feature_extractors.get_batch_wt_histos(
+        train_images,
         wavelet_name,
-        level,
-        [
-            feature_extractors.Wt_direction.HORIZONTAL,
-            feature_extractors.Wt_direction.VERTICAL
-        ],
+        levels,
+        wt_directions,
         number_bins
     )
     clf = RandomForestClassifier(n_estimators=1000, max_depth=4, class_weight='balanced')
     clf.fit(
-        wt_histos[: train_images.shape[0]],
+        feature_extractors.get_batch_wt_histos(
+            train_images,
+            wavelet_name,
+            levels,
+            wt_directions,
+            number_bins
+        ),
         train_labels
     )
     plot_confusion_matrix(
         clf,
-        wt_histos[train_images.shape[0]:],
+        feature_extractors.get_batch_wt_histos(
+            test_images,
+            wavelet_name,
+            levels,
+            wt_directions,
+            number_bins
+        ),
         test_labels
     )
     plt.show()
@@ -137,6 +140,10 @@ if __name__ == '__main__':
         labels[dataset_generator.Dataset_type.TEST],
         'haar',
         [1, 2],
+        [
+            feature_extractors.Wt_direction.HORIZONTAL,
+            feature_extractors.Wt_direction.VERTICAL
+        ],
         50
     )
 
