@@ -81,15 +81,7 @@ def svm_main_with_dwt(args, train_images, train_labels, test_images, test_labels
         feature_extractors.Wt_direction.VERTICAL,
         number_bins
     )
-    #for batch_images, batch_labels in augmented_data_generator:
-    #    model.fit(
-    #        feature_extractors.extract_wavelet_features(
-    #            batch_images,
-    #            wavelet_name,
-    #            level
-    #        ),
-    #        batch_labels
-    #    )
+
     model.fit(
         wt_histos[: train_images.shape[0]],
         train_labels
