@@ -136,7 +136,7 @@ if __name__ == '__main__':
         images[dataset_generator.Dataset_type.TEST],
         labels[dataset_generator.Dataset_type.TEST],
         'haar',
-        1,
+        [1, 2],
         50
     )
 
