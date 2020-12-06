@@ -67,7 +67,7 @@ def get_batch_wt_histo_per_level(images_batch, wavelet_name, level, wt_direction
             np.array(
                 [
                     get_wt_histo(
-                        image_direction_wt.flatten(),
+                        image_direction_wt,
                         histo_max,
                         histo_min,
                         bins_number,
@@ -99,9 +99,9 @@ def get_batch_wt_histos(images_batch, wavelet_name, levels, wt_directions, bins_
     )
 
 def get_wt_histo(image, histo_max, histo_min, bins_number, just_histo):
-    step = (histo_max - histo_min) / bins_number
+    step = (histo_max - histo_min + 1) / bins_number
     histo = np.histogram(
-        image,
+        image.flatten(),
         bins=np.arange(
             histo_min,
             histo_max + step,
