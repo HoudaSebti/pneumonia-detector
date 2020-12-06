@@ -78,7 +78,9 @@ def get_batch_wt_histo_per_level(images_batch, wavelet_name, level, wt_direction
     )    
     
 def get_batch_wt_histos(images_batch, wavelet_name, levels, wt_directions, bins_number, just_histo=True):
-    batch_wt_histos = np.zeros((images_batch.shape[0], levels.size, wt_directions.size, bins_number))
+    batch_wt_histos = np.zeros(
+        (images_batch.shape[0], np.array(levels).size, np.array(wt_directions).size, bins_number)
+    )
     for level_idx, level in enumerate(levels):
         batch_wt_histos[:, level_idx, :] = get_batch_wt_histo_per_level(
             images_batch,
