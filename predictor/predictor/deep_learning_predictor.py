@@ -16,8 +16,14 @@ from keras.optimizers import Adam, SGD, RMSprop
 from keras.callbacks import ModelCheckpoint, Callback, EarlyStopping
 
 from preprocessor import deep_learning_preprocessor
+import torch.optim as optim
 
-def train_pytorch_model(model, train_images_batches, train_labels_batches, optimizer, criterion, epochs_num):
+def train_pytorch_model(model, train_images_batches, train_labels_batches, optimizer, optimizer_params, criterion, epochs_num):
+    optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+    getattr(
+        sys.modules['torch.optim'],
+        optimizer
+    )(**optimizer_params)
     for epoch in range(epochs_num):  # loop over the dataset multiple times
         running_loss = 0.0
 
@@ -35,7 +41,7 @@ def train_pytorch_model(model, train_images_batches, train_labels_batches, optim
                 running_loss = 0.0
     return model
 
-def predict_with_pytorch(model_name, train_images_batches, train_labels_batches, test_images, test_labels, optimizer, criterion, epochs_num):
+def predict_with_pytorch(model_name, train_images_batches, train_labels_batches, test_images, test_labels, optimizer, optimizer_params, criterion, epochs_num):
     model = getattr(
         sys.modules['torchvision.models'],
         model_name
@@ -48,6 +54,7 @@ def predict_with_pytorch(model_name, train_images_batches, train_labels_batches,
         train_images_batches,
         train_labels_batches,
         optimizer,
+        optimizer_params,
         criterion,
         epochs_num
     )

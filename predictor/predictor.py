@@ -146,7 +146,8 @@ def deep_learning_main(model_name, train_images, train_labels, test_images, test
         [train_labels],
         test_images,
         test_labels,
-        optim.SGD(net.parameters(), lr=0.001, momentum=0.9),
+        'SGD',
+        {'lr' : .001, 'momentum' : .9},
         nn.CrossEntropyLoss(),
         2
     )
