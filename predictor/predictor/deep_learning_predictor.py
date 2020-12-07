@@ -26,11 +26,15 @@ def train_pytorch_model(model, train_images_batches, train_labels_batches, optim
     )(**optimizer_params)
     for epoch in range(epochs_num):  # loop over the dataset multiple times
         running_loss = 0.0
-
-        for i, (image_batch, label_batch) in enumerate(zip(train_images_batches, train_labels_batches)):
+        for i, (images_batch, labels_batch) in enumerate(zip(train_images_batches, train_labels_batches)):
             optimizer.zero_grad()
-            outputs = model(deep_learning_preprocessor(image_batch))
-            loss = criterion(outputs, label_batch)
+            if torch.cuda.is_available():
+                images_batch, labels_batch = deep_learning_preprocessor.preprocess_batch(
+                    images_batch,
+                    labels_batch
+                ).to("cuda")
+            outputs = model(deep_learning_preprocessor(images_batch))
+            loss = criterion(outputs, labels_batch)
             loss.backward()
             optimizer.step()
             # print statistics
@@ -47,8 +51,7 @@ def predict_with_pytorch(model_name, train_images_batches, train_labels_batches,
         model_name
     )(pretrained = False)
     if torch.cuda.is_available():
-        train_images_batches = deep_learning_preprocessor.preprocess_batch(train_images_batches).to("cuda")
-    model.to("cuda")
+        model.to("cuda")
     model = train_pytorch_model(
         model,
         train_images_batches,
