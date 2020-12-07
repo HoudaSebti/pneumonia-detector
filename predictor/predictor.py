@@ -10,6 +10,9 @@ from sklearn.svm import SVC
 from sklearn.metrics import plot_confusion_matrix
 from sklearn.ensemble import RandomForestClassifier
 
+import torch.nn as nn
+import torch.optim as optim
+
 import pywt
 
 import matplotlib.pyplot as plt
@@ -125,26 +128,37 @@ def wt_random_forest_main(train_images, train_labels, test_images, test_labels, 
     )
     plt.show()
 
-def deep_learning_main():
-    #model=deep_learning_predictor.build_model((224,224,3))
-    #model.summary()
-    return None
+def deep_learning_main(model_name, train_images, train_labels, test_images, test_labels):
+    augmented_data_generator = dataset_generator.get_augmented_data(
+        train_images,
+        train_labels,
+        32,
+        500,
+        rotation_range=90,
+        brightness_range=(0.3,0.8),
+        horizontal_flip=True,
+        height_shift_range=0.2,
+        fill_mode='constant'
+    )
+    deep_learning_predictor.predict_with_pytorch(
+        model_name,
+        [train_images],
+        [train_labels],
+        test_images,
+        test_labels,
+        optim.SGD(net.parameters(), lr=0.001, momentum=0.9),
+        nn.CrossEntropyLoss(),
+        2
+    )
 
 if __name__ == '__main__':
     args = argument_parser.parse_args()
     images, labels = dataset_generator.generate_full_dataset(x_size=224, y_size=224)   
-    wt_random_forest_main(
+    deep_learning_main(
+        'alexnet',
         images[dataset_generator.Dataset_type.TRAIN],
         labels[dataset_generator.Dataset_type.TRAIN],
         images[dataset_generator.Dataset_type.TEST],
-        labels[dataset_generator.Dataset_type.TEST],
-        'haar',
-        [1, 2],
-        [
-            feature_extractors.Wt_direction.HORIZONTAL,
-            feature_extractors.Wt_direction.VERTICAL
-        ],
-        50
+        labels[dataset_generator.Dataset_type.TEST]
     )
-
 

@@ -1,3 +1,8 @@
+import sys
+
+import torch
+from torchvision import models, transforms
+
 from keras.models import Sequential, Model
 from keras.applications.vgg16 import VGG16, preprocess_input
 from keras.preprocessing.image import ImageDataGenerator,load_img, img_to_array
@@ -9,6 +14,46 @@ from keras.layers.merge import Concatenate
 from keras.models import Model
 from keras.optimizers import Adam, SGD, RMSprop
 from keras.callbacks import ModelCheckpoint, Callback, EarlyStopping
+
+from preprocessor import deep_learning_preprocessor
+
+def train_pytorch_model(model, train_images_batches, train_labels_batches, optimizer, criterion, epochs_num):
+    for epoch in range(epochs_num):  # loop over the dataset multiple times
+        running_loss = 0.0
+
+        for i, (image_batch, label_batch) in enumerate(zip(train_images_batches, train_labels_batches)):
+            optimizer.zero_grad()
+            outputs = model(deep_learning_preprocessor(image_batch))
+            loss = criterion(outputs, label_batch)
+            loss.backward()
+            optimizer.step()
+            # print statistics
+            running_loss += loss.item()
+            if i % 2000 == 1999:    # print every 2000 mini-batches
+                print('[%d, %5d] loss: %.3f' %
+                    (epoch + 1, i + 1, running_loss / 2000))
+                running_loss = 0.0
+    return model
+
+def predict_with_pytorch(model_name, train_images_batches, train_labels_batches, test_images, test_labels, optimizer, criterion, epochs_num):
+    model = getattr(
+        sys.modules['torchvision.models'],
+        model_name
+    )(pretrained = False)
+    if torch.cuda.is_available():
+      input_batch = input_batch.to("cuda")
+    model.to("cuda")
+    model = train_pytorch_model(
+        model,
+        train_images_batches,
+        train_labels_batches,
+        optimizer,
+        criterion,
+        epochs_num
+    )
+
+
+    print('Finished Training')
 
 def build_model(input_shape):
     #use the sequential thing

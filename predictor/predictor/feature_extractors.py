@@ -91,7 +91,6 @@ def get_batch_wt_histos(images_batch, wavelet_name, levels, wt_directions, bins_
             bins_number,
             just_histo
         )
-    print('done getting wavelets')
     return np.array(
         [
             image_wt_histo.flatten() for image_wt_histo in batch_wt_histos
