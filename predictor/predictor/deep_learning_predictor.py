@@ -34,7 +34,7 @@ def train_pytorch_model(model, train_images_batch, train_labels_batch, optimizer
                 )
                 images_batch = images_batch.to("cuda")
                 labels_batch = labels_batch.to("cuda")
-            outputs = model(deep_learning_preprocessor(images_batch))
+            outputs = model(images_batch)
             loss = criterion(outputs, labels_batch)
             loss.backward()
             optimizer.step()
