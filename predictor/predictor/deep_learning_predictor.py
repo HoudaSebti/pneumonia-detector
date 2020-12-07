@@ -21,7 +21,7 @@ import torch.optim as optim
 def train_pytorch_model(model, train_images_batches, train_labels_batches, optimizer_name, optimizer_params, criterion, epochs_num):
     optimizer = getattr(
         sys.modules['torch.optim'],
-        optimizer_name
+        optimizer_name,
     )(**optimizer_params)
     for epoch in range(epochs_num):  # loop over the dataset multiple times
         running_loss = 0.0
@@ -55,7 +55,7 @@ def predict_with_pytorch(model_name, train_images_batches, train_labels_batches,
         model,
         train_images_batches,
         train_labels_batches,
-        optimizer,
+        optimizer_name,
         optimizer_params,
         criterion,
         epochs_num
