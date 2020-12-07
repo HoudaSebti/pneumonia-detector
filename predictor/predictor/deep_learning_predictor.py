@@ -19,7 +19,6 @@ from preprocessor import deep_learning_preprocessor
 import torch.optim as optim
 
 def train_pytorch_model(model, train_images_batches, train_labels_batches, optimizer, optimizer_params, criterion, epochs_num):
-    optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
     getattr(
         sys.modules['torch.optim'],
         optimizer
