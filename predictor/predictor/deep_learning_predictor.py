@@ -18,22 +18,22 @@ from keras.callbacks import ModelCheckpoint, Callback, EarlyStopping
 from preprocessor import deep_learning_preprocessor
 import torch.optim as optim
 
-def train_pytorch_model(model, train_batch_imageses, train_batch_labelses, optimizer_name, optimizer_params, criterion, epochs_num):
+def train_pytorch_model(model, train_images_batch, train_labels_batch, optimizer_name, optimizer_params, criterion, epochs_num):
     optimizer = getattr(
         sys.modules['torch.optim'],
         optimizer_name,
     )(params = model.parameters(), **optimizer_params)
     for epoch in range(epochs_num):  # loop over the dataset multiple times
         running_loss = 0.0
-        for i, (batch_images, batch_labels) in enumerate(zip(train_batch_imageses, train_batch_labelses)):
+        for i, (images_batch, labels_batch) in enumerate(zip(train_images_batch, train_labels_batch)):
             optimizer.zero_grad()
             if torch.cuda.is_available():
-                batch_images, batch_labels = deep_learning_preprocessor.preprocess_batch(
-                    batch_images,
-                    batch_labels
+                images_batch, labels_batch = deep_learning_preprocessor.preprocess_batch(
+                    images_batch,
+                    labels_batch
                 ).to("cuda")
-            outputs = model(deep_learning_preprocessor(batch_images))
-            loss = criterion(outputs, batch_labels)
+            outputs = model(deep_learning_preprocessor(images_batch))
+            loss = criterion(outputs, labels_batch)
             loss.backward()
             optimizer.step()
             # print statistics
@@ -44,7 +44,7 @@ def train_pytorch_model(model, train_batch_imageses, train_batch_labelses, optim
                 running_loss = 0.0
     return model
 
-def predict_with_pytorch(model_name, train_batch_imageses, train_batch_labelses, test_images, test_labels, optimizer_name, optimizer_params, criterion, epochs_num):
+def predict_with_pytorch(model_name, train_images_batches, train_labels_batches, test_images, test_labels, optimizer_name, optimizer_params, criterion, epochs_num):
     model = getattr(
         sys.modules['torchvision.models'],
         model_name
@@ -53,8 +53,8 @@ def predict_with_pytorch(model_name, train_batch_imageses, train_batch_labelses,
         model.to("cuda")
     model = train_pytorch_model(
         model,
-        train_batch_imageses,
-        train_batch_labelses,
+        train_images_batches,
+        train_labels_batches,
         optimizer_name,
         optimizer_params,
         criterion,

@@ -37,12 +37,12 @@ def svm_main_with_hog(args, train_images, train_labels, test_images, test_labels
             gamma = .001,
             class_weight = 'balanced'
     )
-    for batch_images, batch_labels in augmented_data_generator:
+    for images_batch, labels_batch in augmented_data_generator:
         model.fit(
             feature_extractors.extract_batch_hog_features(
-                batch_images
+                images_batch
             ),
-            batch_labels
+            labels_batch
         )
 
     plot_confusion_matrix(
@@ -142,8 +142,8 @@ def deep_learning_main(model_name, train_images, train_labels, test_images, test
     )
     deep_learning_predictor.predict_with_pytorch(
         model_name,
-        [[train_images]],
-        [[train_labels]],
+        [train_images],
+        [train_labels],
         test_images,
         test_labels,
         'SGD',
