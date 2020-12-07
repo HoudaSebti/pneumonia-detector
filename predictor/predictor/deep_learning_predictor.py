@@ -47,7 +47,7 @@ def predict_with_pytorch(model_name, train_images_batches, train_labels_batches,
         model_name
     )(pretrained = False)
     if torch.cuda.is_available():
-      input_batch = input_batch.to("cuda")
+      train_images_batches = deep_learning_preprocessor.preprocess_batch(train_images_batches).to("cuda")
     model.to("cuda")
     model = train_pytorch_model(
         model,
