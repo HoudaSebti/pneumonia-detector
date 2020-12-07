@@ -45,7 +45,7 @@ def extract_batch_hog_features(batch_images, orientations=9, pixels_per_cell=(8,
         ]
     )
 
-def get_batch_wt_histo_per_level(images_batch, wavelet_name, level, wt_directions, bins_number, just_histo):
+def get_batch_wt_histo_per_level(batch_images, wavelet_name, level, wt_directions, bins_number, just_histo):
     wavelet_transforms = np.array(
         [
             np.array(
@@ -57,7 +57,7 @@ def get_batch_wt_histo_per_level(images_batch, wavelet_name, level, wt_direction
                         wt_direction
                     ) for wt_direction in wt_directions
                 ]
-            ) for image in images_batch
+            ) for image in batch_images
         ]
     )
     histo_max = np.percentile(wavelet_transforms, 99)
@@ -78,13 +78,13 @@ def get_batch_wt_histo_per_level(images_batch, wavelet_name, level, wt_direction
         ]
     )    
     
-def get_batch_wt_histos(images_batch, wavelet_name, levels, wt_directions, bins_number, just_histo=True):
+def get_batch_wt_histos(batch_images, wavelet_name, levels, wt_directions, bins_number, just_histo=True):
     batch_wt_histos = np.zeros(
-        (images_batch.shape[0], np.array(levels).size, np.array(wt_directions).size, bins_number)
+        (batch_images.shape[0], np.array(levels).size, np.array(wt_directions).size, bins_number)
     )
     for level_idx, level in enumerate(levels):
         batch_wt_histos[:, level_idx, :] = get_batch_wt_histo_per_level(
-            images_batch,
+            batch_images,
             wavelet_name,
             level,
             wt_directions,
