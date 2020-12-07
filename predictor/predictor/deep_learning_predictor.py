@@ -18,10 +18,10 @@ from keras.callbacks import ModelCheckpoint, Callback, EarlyStopping
 from preprocessor import deep_learning_preprocessor
 import torch.optim as optim
 
-def train_pytorch_model(model, train_images_batches, train_labels_batches, optimizer, optimizer_params, criterion, epochs_num):
-    getattr(
+def train_pytorch_model(model, train_images_batches, train_labels_batches, optimizer_name, optimizer_params, criterion, epochs_num):
+    optimizer = getattr(
         sys.modules['torch.optim'],
-        optimizer
+        optimizer_name
     )(**optimizer_params)
     for epoch in range(epochs_num):  # loop over the dataset multiple times
         running_loss = 0.0
@@ -44,7 +44,7 @@ def train_pytorch_model(model, train_images_batches, train_labels_batches, optim
                 running_loss = 0.0
     return model
 
-def predict_with_pytorch(model_name, train_images_batches, train_labels_batches, test_images, test_labels, optimizer, optimizer_params, criterion, epochs_num):
+def predict_with_pytorch(model_name, train_images_batches, train_labels_batches, test_images, test_labels, optimizer_name, optimizer_params, criterion, epochs_num):
     model = getattr(
         sys.modules['torchvision.models'],
         model_name
