@@ -22,7 +22,7 @@ def train_pytorch_model(model, train_images_batches, train_labels_batches, optim
     optimizer = getattr(
         sys.modules['torch.optim'],
         optimizer_name,
-    )(**optimizer_params)
+    )(params = model.parameters(), **optimizer_params)
     for epoch in range(epochs_num):  # loop over the dataset multiple times
         running_loss = 0.0
         for i, (images_batch, labels_batch) in enumerate(zip(train_images_batches, train_labels_batches)):
