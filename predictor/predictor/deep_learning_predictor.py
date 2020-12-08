@@ -25,10 +25,10 @@ import torch.optim as optim
 def train_on_batch(model, optimizer, criterion, epoch, batch_num, batch_images, batch_labels, confusion_matrix):
     optimizer.zero_grad()
     if torch.cuda.is_available():
-        images_batch = images_batch.cuda()
-        labels_batch = labels_batch.cuda()
-    outputs = model(torch.unsqueeze(images_batch, 1).float())
-    loss = criterion(outputs, labels_batch)
+        batch_images = batch_images.cuda()
+        batch_labels = batch_labels.cuda()
+    outputs = model(torch.unsqueeze(batch_images, 1).float())
+    loss = criterion(outputs, batch_labels)
     loss.backward()
     optimizer.step()
 
@@ -40,7 +40,7 @@ def train_on_batch(model, optimizer, criterion, epoch, batch_num, batch_images, 
     print('the loss:')
     print(loss.item())
     _, preds = torch.max(outputs, 1)
-    for t, p in zip(labels_batch.view(-1), preds.view(-1)):
+    for t, p in zip(batch_labels.view(-1), preds.view(-1)):
         confusion_matrix[t.long(), p.long()] += 1
     print('confusion matrix')
     print(confusion_matrix)
