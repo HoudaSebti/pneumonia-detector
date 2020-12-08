@@ -87,11 +87,10 @@ def adjust_dataset(images_paths, x_size, y_size, with_normalization):
     return np.array(images_arrays)
 
 def get_augmented_data(images_arrays, images_labels, batch_size=16, batch_number=500, **augmentation_techs):
-    datagen = ImageDataGenerator(**augmentation_techs)
     return augment_images(
         images_arrays,
         images_labels,
-        datagen,
+        ImageDataGenerator(**augmentation_techs),
         batch_size,
         batch_number
     )

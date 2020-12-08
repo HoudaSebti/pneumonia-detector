@@ -1,7 +1,10 @@
 import sys
 
 import torch
+import torch.nn as nn
 from torchvision import models, transforms
+from utilities import data_utils
+
 
 from keras.models import Sequential, Model
 from keras.applications.vgg16 import VGG16, preprocess_input
@@ -18,45 +21,76 @@ from keras.callbacks import ModelCheckpoint, Callback, EarlyStopping
 from preprocessor import deep_learning_preprocessor
 import torch.optim as optim
 
-def train_pytorch_model(model, train_images_batch, train_labels_batch, optimizer_name, optimizer_params, criterion, epochs_num):
+
+def train_on_batch(model, optimizer, criterion, epoch, batch_num, batch_images, batch_labels, confusion_matrix):
+    optimizer.zero_grad()
+    if torch.cuda.is_available():
+        images_batch = images_batch.cuda()
+        labels_batch = labels_batch.cuda()
+    outputs = model(torch.unsqueeze(images_batch, 1).float())
+    loss = criterion(outputs, labels_batch)
+    loss.backward()
+    optimizer.step()
+
+    print(
+        'for epoch: %s and batch: %s ' %(
+            str(epoch), str(batch_num)
+        )
+    )
+    print('the loss:')
+    print(loss.item())
+    _, preds = torch.max(outputs, 1)
+    for t, p in zip(labels_batch.view(-1), preds.view(-1)):
+        confusion_matrix[t.long(), p.long()] += 1
+    print('confusion matrix')
+    print(confusion_matrix)
+    return confusion_matrix
+
+def train_pytorch_model(model, train_data_generator, optimizer_name, optimizer_params, criterion, epochs_num):
     optimizer = getattr(
         sys.modules['torch.optim'],
         optimizer_name,
     )(params = model.parameters(), **optimizer_params)
+    confusion_matrix = torch.zeros(2, 2)
     for epoch in range(epochs_num):  # loop over the dataset multiple times
         running_loss = 0.0
-        for i, (images_batch, labels_batch) in enumerate(zip(train_images_batch, train_labels_batch)):
-            optimizer.zero_grad()
-            if torch.cuda.is_available():
-                images_batch, labels_batch = deep_learning_preprocessor.preprocess_batch(
-                    images_batch,
-                    labels_batch
-                )
-                images_batch = images_batch.to("cuda")
-                labels_batch = labels_batch.to("cuda")
-            outputs = model(images_batch)
-            loss = criterion(outputs, labels_batch)
-            loss.backward()
-            optimizer.step()
-            # print statistics
-            running_loss += loss.item()
-            if i % 2000 == 1999:    # print every 2000 mini-batches
-                print('[%d, %5d] loss: %.3f' %
-                    (epoch + 1, i + 1, running_loss / 2000))
-                running_loss = 0.0
+        for i, (batch_images, batch_labels) in enumerate(train_data_generator):
+            confusion_matrix = train_on_batch(
+                model,
+                optimizer,
+                criterion,
+                epoch,
+                i,
+                batch_images,
+                batch_labels,
+                confusion_matrix
+            )
     return model
 
-def predict_with_pytorch(model_name, train_images_batches, train_labels_batches, test_images, test_labels, optimizer_name, optimizer_params, criterion, epochs_num):
+def predict_with_pytorch(model_name, train_images, train_labels, test_images, test_labels, optimizer_name, optimizer_params, criterion, epochs_num, batch_size):
     model = getattr(
         sys.modules['torchvision.models'],
         model_name
-    )(pretrained = False)
+    )(
+        pretrained=False,
+        num_classes=2
+    )
+    model.features[0] = nn.Conv2d(1, 64, kernel_size=(11, 11), stride=(4, 4), padding=(2, 2))
     if torch.cuda.is_available():
-        model.to("cuda")
+        model.cuda()
     model = train_pytorch_model(
         model,
-        train_images_batches,
-        train_labels_batches,
+        torch.utils.data.DataLoader(
+            data_utils.Dataset(
+                train_images,
+                train_labels
+            ),
+            **{
+                'batch_size': batch_size,
+                'shuffle': True,
+                'num_workers': 6
+            }
+        ),
         optimizer_name,
         optimizer_params,
         criterion,

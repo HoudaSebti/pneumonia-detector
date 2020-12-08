@@ -142,14 +142,15 @@ def deep_learning_main(model_name, train_images, train_labels, test_images, test
     )
     deep_learning_predictor.predict_with_pytorch(
         model_name,
-        [[train_images]],
-        [[train_labels]],
+        train_images,
+        train_labels,
         test_images,
         test_labels,
         'SGD',
         {'lr' : .001, 'momentum' : .9},
         nn.CrossEntropyLoss(),
-        2
+        2,
+        64
     )
 
 if __name__ == '__main__':
