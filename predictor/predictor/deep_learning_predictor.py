@@ -22,7 +22,7 @@ from preprocessor import deep_learning_preprocessor
 import torch.optim as optim
 
 
-def train_on_batch(model, optimizer, criterion, epoch, batch_num, batch_images, batch_labels, confusion_matrix):
+def train_on_batch(batch_images, batch_labels, model, optimizer, criterion, epoch, batch_num, confusion_matrix=None):
     optimizer.zero_grad()
     if torch.cuda.is_available():
         batch_images = batch_images.cuda()
@@ -31,19 +31,23 @@ def train_on_batch(model, optimizer, criterion, epoch, batch_num, batch_images, 
     loss = criterion(outputs, batch_labels)
     loss.backward()
     optimizer.step()
-
-    print(
-        'for epoch: %s and batch: %s ' %(
-            str(epoch), str(batch_num)
+    if epoch is not None:
+        print(
+            'for epoch: %s and batch: %s ' %(
+                str(epoch), str(batch_num)
+            )
         )
-    )
     print('the loss:')
     print(loss.item())
+
+def get_confusion_matrix(model, images, labels, confusion_matrix):
+    if torch.cuda.is_available():
+        images = images.cuda()
+        labels = labels.cuda()
+    outputs = model(torch.unsqueeze(images, 1).float())
     _, preds = torch.max(outputs, 1)
-    for t, p in zip(batch_labels.view(-1), preds.view(-1)):
+    for t, p in zip(labels.view(-1), preds.view(-1)):
         confusion_matrix[t.long(), p.long()] += 1
-    print('confusion matrix')
-    print(confusion_matrix)
     return confusion_matrix
 
 def train_pytorch_model(model, train_data_generator, optimizer_name, optimizer_params, criterion, epochs_num):
@@ -51,19 +55,18 @@ def train_pytorch_model(model, train_data_generator, optimizer_name, optimizer_p
         sys.modules['torch.optim'],
         optimizer_name,
     )(params = model.parameters(), **optimizer_params)
-    confusion_matrix = torch.zeros(2, 2)
+    
     for epoch in range(epochs_num):  # loop over the dataset multiple times
         running_loss = 0.0
         for i, (batch_images, batch_labels) in enumerate(train_data_generator):
-            confusion_matrix = train_on_batch(
+            train_on_batch(
+                batch_images,
+                batch_labels,
                 model,
                 optimizer,
                 criterion,
                 epoch,
-                i,
-                batch_images,
-                batch_labels,
-                confusion_matrix
+                i
             )
     return model
 
@@ -96,9 +99,26 @@ def predict_with_pytorch(model_name, train_images, train_labels, test_images, te
         criterion,
         epochs_num
     )
-
-
+    
     print('Finished Training')
+    predict(
+        model,
+        torch.utils.data.DataLoader(
+            data_utils.Dataset(
+                test_images,
+                test_labels
+            )
+        ),
+        confusion_matrix = torch.zeros(2, 2)
+    )
+
+def predict(model, test_data_generator, confusion_matrix):
+    print('confusion matrix for testing: ')
+    for batch_num, (test_images, test_labels) in enumerate(test_data_generator):
+        print('for batch number: %s the confusion matrix is: ' %str(batch_num))
+        print(
+            get_confusion_matrix(model, test_images, test_labels, confusion_matrix)
+        )
 
 def build_model(input_shape):
     #use the sequential thing
