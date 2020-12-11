@@ -186,7 +186,7 @@ def deep_learning_main(model_name, train_images, train_labels, test_images, test
         'SGD',
         {'lr' : .001, 'momentum' : .9},
         nn.CrossEntropyLoss(),
-        2,
+        100,
         64
     )
 
