@@ -142,55 +142,45 @@ def deep_learning_main(model_name, train_images, train_labels, test_images, test
             fill_mode='constant'
         )
         augmented_data_list = list(augmented_data_generator)
-        deep_learning_predictor.predict_with_pytorch(
-            model_name,
-            np.concatenate(
-                [
-                    train_images,
-                    np.array(
-                        [
-                            image
-                            for augmented_data_batch in augmented_data_list
-                            for image in augmented_data_batch[0]
-                        ]
-                    )
-                ],
-                axis=0
-            ),
-            np.concatenate(
-                [
-                    train_labels,
-                    np.array(
-                        [
-                            label
-                            for augmented_data_batch in augmented_data_list
-                            for label in augmented_data_batch[1]
-                        ]
-                    )
-                ],
-                axis=0
-            ),
-            test_images,
-            test_labels,
-            'SGD',
-            {'lr' : .001, 'momentum' : 0},
-            nn.CrossEntropyLoss(),
-            100,
-            64
+        train_images = np.concatenate(
+            [
+                train_images,
+                np.array(
+                    [
+                        image
+                        for augmented_data_batch in augmented_data_list
+                        for image in augmented_data_batch[0]
+                    ]
+                )
+            ],
+            axis=0
         )
-    else:
-        deep_learning_predictor.predict_with_pytorch(
-            model_name,
-            train_images,
-            train_labels,
-            test_images,
-            test_labels,
-            'SGD',
-            {'lr' : .001, 'momentum' : 0},
-            nn.CrossEntropyLoss(),
-            100,
-            64
+        train_labels = np.concatenate(
+            [
+                train_labels,
+                np.array(
+                    [
+                        label
+                        for augmented_data_batch in augmented_data_list
+                        for label in augmented_data_batch[1]
+                    ]
+                )
+            ],
+            axis=0
         )
+
+    deep_learning_predictor.predict_with_pytorch(
+        model_name,
+        train_images,
+        train_labels,
+        test_images,
+        test_labels,
+        'SGD',
+        {'lr' : .001, 'momentum' : .5},
+        nn.CrossEntropyLoss(),
+        100,
+        64
+    )
 
 if __name__ == '__main__':
     args = argument_parser.parse_args()
