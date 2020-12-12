@@ -151,8 +151,7 @@ def deep_learning_main(model_name, train_images, train_labels, test_images, test
                         [
                             image
                             for augmented_data_batch in augmented_data_list
-                            for augmented_data in augmented_data_batch
-                            for image in augmented_data[0]
+                            for image in augmented_data_batch[0]
                         ]
                     )
                 ],
@@ -165,8 +164,7 @@ def deep_learning_main(model_name, train_images, train_labels, test_images, test
                         [
                             label
                             for augmented_data_batch in augmented_data_list
-                            for augmented_data in augmented_data_batch
-                            for label in augmented_data[1]
+                            for label in augmented_data_batch[1]
                         ]
                     )
                 ],
