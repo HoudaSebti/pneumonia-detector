@@ -148,7 +148,7 @@ def deep_learning_main(model_name, train_images, train_labels, test_images, test
                 train_images,
                 np.array(
                     [
-                        augmented_data[0] for augmented_data in augmented_data_batch for augmented_data_batch in augmented_data_list
+                        image for image in augmented_data[0] for augmented_data in augmented_data_batch for augmented_data_batch in augmented_data_list
                     ]
                 )
             ],
@@ -159,7 +159,7 @@ def deep_learning_main(model_name, train_images, train_labels, test_images, test
                 train_labels,
                 np.array(
                     [
-                        augmented_data[1] for augmented_data in augmented_data_batch for augmented_data_batch in augmented_data_list
+                        label for label in augmented_data[1] for augmented_data in augmented_data_batch for augmented_data_batch in augmented_data_list
                     ]
                 )
             ],
@@ -180,7 +180,7 @@ def deep_learning_main(model_name, train_images, train_labels, test_images, test
     #    test_images,
     #    test_labels,
     #    'SGD',
-    #    {'lr' : .001, 'momentum' : .9},
+    #    {'lr' : .001, 'momentum' : 0},
     #    nn.CrossEntropyLoss(),
     #    100,
     #    64
