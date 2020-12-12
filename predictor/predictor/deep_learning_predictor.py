@@ -100,20 +100,7 @@ def train_pytorch_model(model, train_data_generator, optimizer_name, optimizer_p
         )
         f_scores[epoch] = recalls[epoch] * precisions[epoch]
         losses[epoch] = running_loss / data_size
-    fig = plt.figure()
-    plt.subplot(3, 1, 1)
-    plt.plot(list(range(epochs_num)), f_scores)
-    plt.plot(list(range(epochs_num)), recalls)
-    plt.plot(list(range(epochs_num)), precisions)
-    plt.legend(['f_scores', 'recalls', 'precisions'])
-    plt.subplot(3, 1, 2)
-    plt.plot(list(range(epochs_num)), accuracies)
-    plt.legend(['accuracies'])
-    plt.subplot(3,1,3)
-    plt.plot(list(range(epochs_num)), losses)
-    plt.legend(['losses'])
-    
-    return model
+    return model, f_scores, recalls, precisions, accuracies, losses
 
 def predict_with_pytorch(model_name, train_images, train_labels, test_images, test_labels, optimizer_name, optimizer_params, criterion, epochs_num, batch_size):
     model = getattr(
@@ -129,7 +116,7 @@ def predict_with_pytorch(model_name, train_images, train_labels, test_images, te
     class_weights = [
         train_images.shape[0] / (2 * np.bincount(train_labels)[i]) for i in range(2)
     ]
-    model = train_pytorch_model(
+    model, f_scores, recalls, precisions, accuracies, losses = train_pytorch_model(
         model,
         torch.utils.data.DataLoader(
             data_utils.Dataset(
@@ -166,6 +153,17 @@ def predict_with_pytorch(model_name, train_images, train_labels, test_images, te
 
         )
     )
+    plt.subplot(3, 1, 1)
+    plt.plot(list(range(epochs_num)), f_scores)
+    plt.plot(list(range(epochs_num)), recalls)
+    plt.plot(list(range(epochs_num)), precisions)
+    plt.legend(['f_scores', 'recalls', 'precisions'])
+    plt.subplot(3, 1, 2)
+    plt.plot(list(range(epochs_num)), accuracies)
+    plt.legend(['accuracies'])
+    plt.subplot(3,1,3)
+    plt.plot(list(range(epochs_num)), losses)
+    plt.legend(['losses'])
     plt.show()
 
 def predict(model, test_data_generator):
