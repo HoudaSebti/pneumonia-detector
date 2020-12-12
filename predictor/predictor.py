@@ -128,63 +128,65 @@ def wt_random_forest_main(train_images, train_labels, test_images, test_labels, 
     )
     plt.show()
 
-def deep_learning_main(model_name, train_images, train_labels, test_images, test_labels):
-    augmented_data_generator = dataset_generator.get_augmented_data(
-        train_images,
-        train_labels,
-        64,
-        200,
-        rotation_range=5,
-        brightness_range=(0.3,0.8),
-        horizontal_flip=True,
-        height_shift_range=0.2,
-        fill_mode='constant'
-    )
-    augmented_data_list = list(augmented_data_generator)
-    deep_learning_predictor.predict_with_pytorch(
-        model_name,
-        np.concatenate(
-            [
-                train_images,
-                np.array(
-                    [
-                        image for image in augmented_data[0] for augmented_data in augmented_data_batch for augmented_data_batch in augmented_data_list
-                    ]
-                )
-            ],
-            axis=0
-        ),
-        np.concatenate(
-            [
-                train_labels,
-                np.array(
-                    [
-                        label for label in augmented_data[1] for augmented_data in augmented_data_batch for augmented_data_batch in augmented_data_list
-                    ]
-                )
-            ],
-            axis=0
-        ),
-        test_images,
-        test_labels,
-        'SGD',
-        {'lr' : .001, 'momentum' : 0},
-        nn.CrossEntropyLoss(),
-        100,
-        64
-    )
-    #deep_learning_predictor.predict_with_pytorch(
-    #    model_name,
-    #    train_images,
-    #    train_labels,
-    #    test_images,
-    #    test_labels,
-    #    'SGD',
-    #    {'lr' : .001, 'momentum' : 0},
-    #    nn.CrossEntropyLoss(),
-    #    100,
-    #    64
-    #)
+def deep_learning_main(model_name, train_images, train_labels, test_images, test_labels, augment_data):
+    if augment_data:
+        augmented_data_generator = dataset_generator.get_augmented_data(
+            train_images,
+            train_labels,
+            64,
+            200,
+            rotation_range=5,
+            brightness_range=(0.3,0.8),
+            horizontal_flip=True,
+            height_shift_range=0.2,
+            fill_mode='constant'
+        )
+        augmented_data_list = list(augmented_data_generator)
+        deep_learning_predictor.predict_with_pytorch(
+            model_name,
+            np.concatenate(
+                [
+                    train_images,
+                    np.array(
+                        [
+                            image for image in augmented_data[0] for augmented_data in augmented_data_batch for augmented_data_batch in augmented_data_list
+                        ]
+                    )
+                ],
+                axis=0
+            ),
+            np.concatenate(
+                [
+                    train_labels,
+                    np.array(
+                        [
+                            label for label in augmented_data[1] for augmented_data in augmented_data_batch for augmented_data_batch in augmented_data_list
+                        ]
+                    )
+                ],
+                axis=0
+            ),
+            test_images,
+            test_labels,
+            'SGD',
+            {'lr' : .001, 'momentum' : 0},
+            nn.CrossEntropyLoss(),
+            100,
+            64
+        )
+    else:
+        deep_learning_predictor.predict_with_pytorch(
+            model_name,
+            train_images,
+            train_labels,
+            test_images,
+            test_labels,
+            'SGD',
+            {'lr' : .001, 'momentum' : 0},
+            nn.CrossEntropyLoss(),
+            100,
+            64
+        )
 
 if __name__ == '__main__':
     args = argument_parser.parse_args()
@@ -194,6 +196,7 @@ if __name__ == '__main__':
         images[dataset_generator.Dataset_type.TRAIN],
         labels[dataset_generator.Dataset_type.TRAIN],
         images[dataset_generator.Dataset_type.TEST],
-        labels[dataset_generator.Dataset_type.TEST]
+        labels[dataset_generator.Dataset_type.TEST],
+        True
     )
 
