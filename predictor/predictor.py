@@ -3,6 +3,7 @@ import numpy as np
 from predictor import deep_learning_predictor, feature_extractors, deep_learning_models
 from utilities import argument_parser
 from preprocessor import dataset_generator
+import torchvision.models as models
 
 from skimage.io import imread, imshow
 from sklearn.decomposition import PCA
@@ -128,7 +129,7 @@ def wt_random_forest_main(train_images, train_labels, test_images, test_labels, 
     )
     plt.show()
 
-def deep_learning_main(model_name, train_images, train_labels, test_images, test_labels, augment_data):
+def deep_learning_main(model, train_images, train_labels, test_images, test_labels, augment_data):
     if augment_data:
         augmented_data_generator = dataset_generator.get_augmented_data(
             train_images,
@@ -170,7 +171,7 @@ def deep_learning_main(model_name, train_images, train_labels, test_images, test
         )
 
     deep_learning_predictor.predict_with_pytorch(
-        deep_learning_models.BatchNormAlexNet(),
+        model,
         train_images,
         train_labels,
         test_images,
@@ -186,7 +187,8 @@ if __name__ == '__main__':
     args = argument_parser.parse_args()
     images, labels = dataset_generator.generate_full_dataset(x_size=224, y_size=224)   
     deep_learning_main(
-        'alexnet',
+        #deep_learning_models.BatchNormAlexNet(),
+        models.vgg16_bn(),
         images[dataset_generator.Dataset_type.TRAIN],
         labels[dataset_generator.Dataset_type.TRAIN],
         images[dataset_generator.Dataset_type.TEST],
