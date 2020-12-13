@@ -184,11 +184,13 @@ def deep_learning_main(model, train_images, train_labels, test_images, test_labe
     )
 
 if __name__ == '__main__':
+    model = models.resnet34()
+    model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
     args = argument_parser.parse_args()
     images, labels = dataset_generator.generate_full_dataset(x_size=224, y_size=224)   
     deep_learning_main(
         #deep_learning_models.BatchNormAlexNet(),
-        models.vgg16_bn(),
+        model,
         images[dataset_generator.Dataset_type.TRAIN],
         labels[dataset_generator.Dataset_type.TRAIN],
         images[dataset_generator.Dataset_type.TEST],
