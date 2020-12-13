@@ -102,15 +102,7 @@ def train_pytorch_model(model, train_data_generator, optimizer_name, optimizer_p
         losses[epoch] = running_loss / data_size
     return model, f_scores, recalls, precisions, accuracies, losses
 
-def predict_with_pytorch(model_name, train_images, train_labels, test_images, test_labels, optimizer_name, optimizer_params, criterion, epochs_num, batch_size):
-    model = getattr(
-        sys.modules['torchvision.models'],
-        model_name
-    )(
-        pretrained=False,
-        num_classes=2
-    )
-    model.features[0] = nn.Conv2d(1, 64, kernel_size=(11, 11), stride=(4, 4), padding=(2, 2))
+def predict_with_pytorch(model, train_images, train_labels, test_images, test_labels, optimizer_name, optimizer_params, criterion, epochs_num, batch_size):
     if torch.cuda.is_available():
         model.cuda()
     class_weights = [

@@ -1,6 +1,6 @@
 import numpy as np
 
-from predictor import deep_learning_predictor, feature_extractors
+from predictor import deep_learning_predictor, feature_extractors, deep_learning_models
 from utilities import argument_parser
 from preprocessor import dataset_generator
 
@@ -170,7 +170,7 @@ def deep_learning_main(model_name, train_images, train_labels, test_images, test
         )
 
     deep_learning_predictor.predict_with_pytorch(
-        model_name,
+        deep_learning_models.BatchNormAlexNet(),
         train_images,
         train_labels,
         test_images,
@@ -178,7 +178,7 @@ def deep_learning_main(model_name, train_images, train_labels, test_images, test
         'SGD',
         {'lr' : .001, 'momentum' : .1},
         nn.CrossEntropyLoss(),
-        500,
+        100,
         64
     )
 
