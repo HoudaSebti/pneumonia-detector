@@ -136,9 +136,9 @@ def deep_learning_main(model, train_images, train_labels, test_images, test_labe
             train_labels,
             64,
             200,
-            rotation_range=5,
-            brightness_range=(0.3,0.8),
-            horizontal_flip=True,
+            rotation_range=3,
+            brightness_range=(0.2,0.9),
+            #horizontal_flip=True,
             height_shift_range=0.2,
             fill_mode='constant'
         )
@@ -184,7 +184,7 @@ def deep_learning_main(model, train_images, train_labels, test_images, test_labe
     )
 
 if __name__ == '__main__':
-    model = models.resnet34(num_classes=2)
+    model = models.resnet50(num_classes=2)
     model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
     args = argument_parser.parse_args()
     images, labels = dataset_generator.generate_full_dataset(x_size=224, y_size=224)   
