@@ -18,7 +18,7 @@ import pywt
 
 import matplotlib.pyplot as plt
 
-import os
+import sys, os
 
 def svm_main_with_hog(args, train_images, train_labels, test_images, test_labels, val_images, val_labels):
     augmented_data_generator = dataset_generator.get_augmented_data(
@@ -183,10 +183,24 @@ def deep_learning_main(model, train_images, train_labels, test_images, test_labe
         64
     )
 
+def get_pretrained_model(model_name):
+    model = getattr(
+        sys.modules['torchvision.models'],
+        model_name,
+    )(num_classes=2, pretrained=True)
+    model = list(model.children())
+    w = model[0].weight
+    model[0] = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=2, bias=False)
+    model[0].weight = nn.Parameter(torch.mean(w, dim=1, keepdim=True))
+    return nn.Sequential(*model)
+
 if __name__ == '__main__':
-    model = models.resnet34(num_classes=2)
-    model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
     args = argument_parser.parse_args()
+    if args.pretrained == 'Flase':
+        model = models.resnet34(num_classes=2, pretrained=True)
+        model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
+    else:
+        model = get_pretrained_model('resnet34')
     images, labels = dataset_generator.generate_full_dataset(x_size=224, y_size=224)   
     deep_learning_main(
         #deep_learning_models.BatchNormAlexNet(),
