@@ -136,9 +136,9 @@ def deep_learning_main(model, train_images, train_labels, test_images, test_labe
             train_labels,
             64,
             200,
-            rotation_range=5,
-            brightness_range=(0.3,0.8),
-            horizontal_flip=True,
+            rotation_range=3,
+            brightness_range=(0.2,0.9),
+            #horizontal_flip=True,
             height_shift_range=0.2,
             fill_mode='constant'
         )
