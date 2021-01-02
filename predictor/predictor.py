@@ -187,7 +187,9 @@ def get_pretrained_model(model_name):
     model = getattr(
         sys.modules['torchvision.models'],
         model_name,
-    )(num_classes=2, pretrained=True)
+    )(pretrained=True)
+    num_ftrs = model.fc.in_features
+    model.fc = nn.Linear(num_ftrs, 2)
     model = list(model.children())
     w = model[0].weight
     model[0] = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=2, bias=False)
@@ -196,6 +198,7 @@ def get_pretrained_model(model_name):
 
 if __name__ == '__main__':
     args = argument_parser.parse_args()
+    print(args.pretrained)
     if args.pretrained == 'False':
         model = models.resnet34(num_classes=2, pretrained=True)
         model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
