@@ -11,6 +11,7 @@ from sklearn.svm import SVC
 from sklearn.metrics import plot_confusion_matrix
 from sklearn.ensemble import RandomForestClassifier
 
+import torch
 import torch.nn as nn
 import torch.optim as optim
 
