@@ -196,7 +196,7 @@ def get_pretrained_model(model_name):
 
 if __name__ == '__main__':
     args = argument_parser.parse_args()
-    if args.pretrained == 'Flase':
+    if args.pretrained == 'False':
         model = models.resnet34(num_classes=2, pretrained=True)
         model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
     else:
