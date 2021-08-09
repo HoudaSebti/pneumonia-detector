@@ -201,7 +201,7 @@ if __name__ == '__main__':
     args = argument_parser.parse_args()
     print(args.pretrained)
     if args.pretrained == 'False':
-        model = models.resnet34(num_classes=2, pretrained=True)
+        model = models.resnet34(num_classes=2, pretrained=False)
         model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
     else:
         model = get_pretrained_model('resnet34')
