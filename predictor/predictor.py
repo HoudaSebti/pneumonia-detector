@@ -8,7 +8,7 @@ import torchvision.models as models
 from skimage.io import imread, imshow
 from sklearn.decomposition import PCA
 from sklearn.svm import SVC
-from sklearn.metrics import plot_confusion_matrix
+from sklearn.metrics import plot_confusion_matrix, f1_score, precision_score, recall_score
 from sklearn.ensemble import RandomForestClassifier
 
 import torch
@@ -96,6 +96,7 @@ def svm_main_with_dwt(args, train_images, train_labels, test_images, test_labels
         wt_histos[train_images.shape[0]:],
         test_labels
     )
+
     plt.show()
 
 def wt_random_forest_main(train_images, train_labels, test_images, test_labels, wavelet_name, levels, wt_directions, number_bins):
@@ -117,16 +118,38 @@ def wt_random_forest_main(train_images, train_labels, test_images, test_labels, 
         ),
         train_labels
     )
+    test_images = feature_extractors.get_batch_wt_histos(
+        test_images,
+        wavelet_name,
+        levels,
+        wt_directions,
+        number_bins
+    )
     plot_confusion_matrix(
         clf,
-        feature_extractors.get_batch_wt_histos(
-            test_images,
-            wavelet_name,
-            levels,
-            wt_directions,
-            number_bins
-        ),
+        test_images,
         test_labels
+    )
+    print('the F1 score for the random forest classifier with wavelets features: ')
+    print(
+        f1_score(
+            clf.predict(test_images),
+            test_labels
+        )
+    )
+    print('the precision score for the random forest classifier with wavelets features: ')
+    print(
+        precision_score(
+            clf.predict(test_images),
+            test_labels
+        )
+    )
+    print('the recall score for the random forest classifier with wavelets features: ')
+    print(
+        recall_score(
+            clf.predict(test_images),
+            test_labels
+        )
     )
     plt.show()
 
@@ -200,12 +223,28 @@ def get_pretrained_model(model_name):
 if __name__ == '__main__':
     args = argument_parser.parse_args()
     print(args.pretrained)
+    images, labels = dataset_generator.generate_full_dataset(x_size=224, y_size=224)   
+    print('Random Forest predictor with wavelets features')
+    wt_random_forest_main(
+        images[dataset_generator.Dataset_type.TRAIN],
+        labels[dataset_generator.Dataset_type.TRAIN],
+        images[dataset_generator.Dataset_type.TEST],
+        labels[dataset_generator.Dataset_type.TEST],
+        'haar',
+        [1, 2],
+        [
+            feature_extractors.Wt_direction.HORIZONTAL,
+            feature_extractors.Wt_direction.VERTICAL
+        ],
+        50
+    )
+    print('deep learning predictor')
     if args.pretrained == 'False':
         model = models.resnet34(num_classes=2, pretrained=False)
         model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
     else:
         model = get_pretrained_model('resnet34')
-    images, labels = dataset_generator.generate_full_dataset(x_size=224, y_size=224)   
+    
     deep_learning_main(
         #deep_learning_models.BatchNormAlexNet(),
         model,
